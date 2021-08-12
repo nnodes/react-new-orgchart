@@ -4,6 +4,9 @@
   "main": "./dist/ChartContainer.js",
   "files": [
     "dist",
+    "build",
+    "public",
+    "src",
     "README.md"
   ],
   "repository": {
