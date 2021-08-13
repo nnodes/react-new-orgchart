@@ -370,7 +370,18 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
             clonedDoc.querySelector('.orgchart').style.transform = '';
           }
         }).then(function (canvas) {
-          base64SvgToBase64Png(canvas, Math.min(chart.current.scrollWidth, 16384), Math.min(chart.current.scrollHeight, 16384), exportFilename);
+          var width, height;
+          var aspectRatio = chart.current.scrollWidth / chart.current.scrollHeight;
+
+          if (aspectRatio > 1) {
+            width = Math.min(chart.current.scrollWidth, 16384);
+            height = width / aspectRatio;
+          } else {
+            height = Math.min(chart.current.scrollHeight, 16384);
+            width = height * aspectRatio;
+          }
+
+          base64SvgToBase64Png(canvas, width, height, exportFilename);
           setExporting(false);
           container.current.scrollLeft = originalScrollLeft;
           container.current.scrollTop = originalScrollTop;
