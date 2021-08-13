@@ -314,13 +314,19 @@ const ChartContainer = forwardRef(
     return (
       <div
         ref={container}
-        className={'orgchart-container ' + containerClass}
+        className={
+          'orgchart-container ' + exporting
+            ? 'exporting-chart-container '
+            : '' + containerClass
+        }
         onWheel={zoom ? zoomHandler : undefined}
         onMouseUp={pan && panning ? panEndHandler : undefined}
       >
         <div
           ref={chart}
-          className={'orgchart ' + chartClass}
+          className={
+            'orgchart ' + exporting ? 'exporting-chart ' : '' + chartClass
+          }
           style={{ transform: transform, cursor: cursor }}
           onClick={clickChartHandler}
           onMouseDown={pan ? panStartHandler : undefined}
