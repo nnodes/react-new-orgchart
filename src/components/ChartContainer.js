@@ -8,7 +8,7 @@ import React, {
 import PropTypes from 'prop-types';
 import { selectNodeService } from './service';
 import JSONDigger from 'json-digger';
-import html2canvas from 'html2canvas-render-offscreen';
+import domtoimage from 'dom-to-image';
 import jsPDF from 'jspdf';
 import ChartNode from './ChartNode';
 import './ChartContainer.css';
@@ -245,6 +245,29 @@ const ChartContainer = forwardRef(
       setDS({ ...dsDigger.ds });
     };
 
+    function base64SvgToBase64Png(originalBase64, width, height, filename) {
+      return new Promise((resolve) => {
+        let img = document.createElement('img');
+        img.onload = function () {
+          document.body.appendChild(img);
+          let canvas = document.createElement('canvas');
+          document.body.removeChild(img);
+          canvas.width = width;
+          canvas.height = height;
+          let ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          try {
+            let data = canvas.toDataURL('image/jpeg');
+            resolve(data);
+            saveAs(data, filename + '.png');
+          } catch (e) {
+            resolve(null);
+          }
+        };
+        img.src = originalBase64;
+      });
+    }
+
     useImperativeHandle(ref, () => ({
       exportTo: (exportFilename, exportFileextension) => {
         exportFilename = exportFilename || 'OrgChart';
@@ -254,30 +277,37 @@ const ChartContainer = forwardRef(
         container.current.scrollLeft = 0;
         const originalScrollTop = container.current.scrollTop;
         container.current.scrollTop = 0;
-        html2canvas(chart.current, {
-          width: chart.current.clientWidth,
-          height: chart.current.clientHeight,
-          onclone: function (clonedDoc) {
-            clonedDoc.querySelector('.orgchart').style.background = 'none';
-            clonedDoc.querySelector('.orgchart').style.transform = '';
-          },
-        }).then(
-          (canvas) => {
-            if (exportFileextension.toLowerCase() === 'pdf') {
-              exportPDF(canvas, exportFilename);
-            } else {
-              exportPNG(canvas, exportFilename);
+        domtoimage
+          .toSvg(chart.current, {
+            width: chart.current.scrollWidth,
+            height: chart.current.scrollHeight,
+            onclone: function (clonedDoc) {
+              clonedDoc.querySelector('.orgchart').style.background = 'none';
+              clonedDoc.querySelector('.orgchart').style.transform = '';
+            },
+          })
+          .then(
+            (canvas) => {
+              if (exportFileextension.toLowerCase() === 'pdf') {
+                exportPDF(canvas, exportFilename);
+              } else {
+                base64SvgToBase64Png(
+                  dataUrl,
+                  exportFilename,
+                  Math.min(chart.current.scrollWidth, 16384),
+                  Math.min(chart.current.scrollHeight, 16384)
+                );
+              }
+              setExporting(false);
+              container.current.scrollLeft = originalScrollLeft;
+              container.current.scrollTop = originalScrollTop;
+            },
+            () => {
+              setExporting(false);
+              container.current.scrollLeft = originalScrollLeft;
+              container.current.scrollTop = originalScrollTop;
             }
-            setExporting(false);
-            container.current.scrollLeft = originalScrollLeft;
-            container.current.scrollTop = originalScrollTop;
-          },
-          () => {
-            setExporting(false);
-            container.current.scrollLeft = originalScrollLeft;
-            container.current.scrollTop = originalScrollTop;
-          }
-        );
+          );
       },
       expandAllNodes: () => {
         chart.current
