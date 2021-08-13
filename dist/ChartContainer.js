@@ -400,12 +400,12 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   });
   return /*#__PURE__*/_react.default.createElement("div", {
     ref: container,
-    className: 'orgchart-container ' + exporting ? 'exporting-chart-container ' : '' + containerClass,
+    className: "orgchart-container ".concat(exporting ? 'exporting-chart-container ' : '', " ").concat(containerClass),
     onWheel: zoom ? zoomHandler : undefined,
     onMouseUp: pan && panning ? panEndHandler : undefined
   }, /*#__PURE__*/_react.default.createElement("div", {
     ref: chart,
-    className: 'orgchart ' + exporting ? 'exporting-chart ' : '' + chartClass,
+    className: "orgchart ".concat(exporting ? 'exporting-chart ' : '', " ").concat(chartClass),
     style: {
       transform: transform,
       cursor: cursor
