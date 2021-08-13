@@ -11,17 +11,26 @@
   text-align: center;
 }
 
+.exporting-chart {
+  transform: none !important;
+}
+
 .orgchart {
   box-sizing: border-box;
   display: inline-block;
-  background-image: linear-gradient(90deg, rgba(200, 0, 0, 0.15) 10%, rgba(0, 0, 0, 0) 10%), linear-gradient(rgba(200, 0, 0, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
+  background-image: linear-gradient(
+      90deg,
+      rgba(200, 0, 0, 0.15) 10%,
+      rgba(0, 0, 0, 0) 10%
+    ),
+    linear-gradient(rgba(200, 0, 0, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
   background-size: 10px 10px;
-  border: 1px dashed rgba(0,0,0,0);
+  border: 1px dashed rgba(0, 0, 0, 0);
   padding: 20px 20px 0 20px;
 }
 
 .orgchart-container .hidden {
-  display: none!important;
+  display: none !important;
 }
 
 .orgchart-container > .oc-mask {
@@ -32,7 +41,7 @@
   left: 0;
   z-index: 999;
   text-align: center;
-  background-color: rgba(0,0,0,0.3);
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .orgchart-container > .oc-mask .spinner {
