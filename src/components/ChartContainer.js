@@ -245,7 +245,27 @@ const ChartContainer = forwardRef(
       setDS({ ...dsDigger.ds });
     };
 
+    function saveAs(uri, filename) {
+      var link = document.createElement('a');
+      if (typeof link.download === 'string') {
+        link.href = uri;
+        link.download = filename;
+
+        //Firefox requires the link to be in the body
+        document.body.appendChild(link);
+
+        //simulate click
+        link.click();
+
+        //remove the link when done
+        document.body.removeChild(link);
+      } else {
+        window.open(uri);
+      }
+    }
+
     function base64SvgToBase64Png(originalBase64, width, height, filename) {
+      console.warn('estoy en tu cosito y es', originalBase64);
       return new Promise((resolve) => {
         let img = document.createElement('img');
         img.onload = function () {
@@ -258,8 +278,8 @@ const ChartContainer = forwardRef(
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           try {
             let data = canvas.toDataURL('image/jpeg');
-            resolve(data);
             saveAs(data, filename + '.png');
+            resolve(data);
           } catch (e) {
             resolve(null);
           }
@@ -277,6 +297,14 @@ const ChartContainer = forwardRef(
         container.current.scrollLeft = 0;
         const originalScrollTop = container.current.scrollTop;
         container.current.scrollTop = 0;
+        console.warn(
+          'hola, el width y height son',
+          chart.current.scrollWidth,
+          chart.current.scrollHeight,
+          'y si feuran sin?',
+          chart.scrollWidth,
+          chart.scrollHeight
+        );
         domtoimage
           .toSvg(chart.current, {
             width: chart.current.scrollWidth,
@@ -292,10 +320,10 @@ const ChartContainer = forwardRef(
                 exportPDF(canvas, exportFilename);
               } else {
                 base64SvgToBase64Png(
-                  dataUrl,
-                  exportFilename,
+                  canvas,
                   Math.min(chart.current.scrollWidth, 16384),
-                  Math.min(chart.current.scrollHeight, 16384)
+                  Math.min(chart.current.scrollHeight, 16384),
+                  exportFilename
                 );
               }
               setExporting(false);
