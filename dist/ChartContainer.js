@@ -17,8 +17,6 @@ var _jsonDigger = _interopRequireDefault(require("json-digger"));
 
 var _domToImage = _interopRequireDefault(require("dom-to-image"));
 
-var _jspdf = _interopRequireDefault(require("jspdf"));
-
 var _ChartNode = _interopRequireDefault(require("./ChartNode"));
 
 require("./ChartContainer.css");
@@ -276,38 +274,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   };
 
   var zoomHandler = function zoomHandler(e) {
-    var newScale = 1 + (e.deltaY > 0 ? -0.2 : 0.2);
+    var newScale = 1 + (e.deltaY > 0 ? -0.01 : 0.01);
     updateChartScale(newScale);
-  };
-
-  var exportPDF = function exportPDF(canvas, exportFilename) {
-    var canvasWidth = Math.floor(canvas.width);
-    var canvasHeight = Math.floor(canvas.height);
-    var doc = canvasWidth > canvasHeight ? new _jspdf.default({
-      orientation: 'landscape',
-      unit: 'px',
-      format: [canvasWidth, canvasHeight]
-    }) : new _jspdf.default({
-      orientation: 'portrait',
-      unit: 'px',
-      format: [canvasHeight, canvasWidth]
-    });
-    doc.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0);
-    doc.save(exportFilename + '.pdf');
-  };
-
-  var exportPNG = function exportPNG(canvas, exportFilename) {
-    var isWebkit = ('WebkitAppearance' in document.documentElement.style);
-    var isFf = !!window.sidebar;
-    var isEdge = navigator.appName === 'Microsoft Internet Explorer' || navigator.appName === 'Netscape' && navigator.appVersion.indexOf('Edge') > -1;
-
-    if (!isWebkit && !isFf || isEdge) {
-      window.navigator.msSaveBlob(canvas.msToBlob(), exportFilename + '.png');
-    } else {
-      setDataURL(canvas.toDataURL());
-      setDownload(exportFilename + '.png');
-      downloadButton.current.click();
-    }
   };
 
   var changeHierarchy = /*#__PURE__*/function () {
@@ -357,7 +325,6 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   }
 
   function base64SvgToBase64Png(originalBase64, width, height, filename) {
-    console.warn('estoy en tu cosito y es', originalBase64);
     return new Promise(function (resolve) {
       var img = document.createElement('img');
 
@@ -368,11 +335,13 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
         canvas.width = width;
         canvas.height = height;
         var ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
         try {
           var data = canvas.toDataURL('image/jpeg');
-          saveAs(data, filename + '.png');
+          saveAs(data, filename + '.jpeg');
           resolve(data);
         } catch (e) {
           resolve(null);
@@ -385,15 +354,13 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
 
   (0, _react.useImperativeHandle)(ref, function () {
     return {
-      exportTo: function exportTo(exportFilename, exportFileextension) {
+      exportTo: function exportTo(exportFilename) {
         exportFilename = exportFilename || 'OrgChart';
-        exportFileextension = exportFileextension || 'png';
         setExporting(true);
         var originalScrollLeft = container.current.scrollLeft;
         container.current.scrollLeft = 0;
         var originalScrollTop = container.current.scrollTop;
         container.current.scrollTop = 0;
-        console.warn('hola, el width y height son', chart.current.scrollWidth, chart.current.scrollHeight, 'y si feuran sin?', chart.scrollWidth, chart.scrollHeight);
 
         _domToImage.default.toSvg(chart.current, {
           width: chart.current.scrollWidth,
@@ -403,12 +370,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
             clonedDoc.querySelector('.orgchart').style.transform = '';
           }
         }).then(function (canvas) {
-          if (exportFileextension.toLowerCase() === 'pdf') {
-            exportPDF(canvas, exportFilename);
-          } else {
-            base64SvgToBase64Png(canvas, Math.min(chart.current.scrollWidth, 16384), Math.min(chart.current.scrollHeight, 16384), exportFilename);
-          }
-
+          base64SvgToBase64Png(canvas, Math.min(chart.current.scrollWidth, 16384), Math.min(chart.current.scrollHeight, 16384), exportFilename);
           setExporting(false);
           container.current.scrollLeft = originalScrollLeft;
           container.current.scrollTop = originalScrollTop;
