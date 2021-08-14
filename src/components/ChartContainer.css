@@ -13,6 +13,7 @@
 
 .exporting-chart {
   transform: none !important;
+  zoom: 1 !important;
 }
 
 .orgchart {

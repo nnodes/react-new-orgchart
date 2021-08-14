@@ -320,6 +320,20 @@ const ChartContainer = forwardRef(
         onWheel={zoom ? zoomHandler : undefined}
         onMouseUp={pan && panning ? panEndHandler : undefined}
       >
+        <link
+          rel="stylesheet"
+          href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
+          integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP"
+          crossorigin="anonymous"
+        ></link>
+
+        <a class="btn zoom">
+          <i class="fas fa-search-plus"></i>
+        </a>
+        <a class="btn zoom-out">
+          <i class="fas fa-search-minus"></i>
+        </a>
+
         <div
           ref={chart}
           className={`orgchart ${

@@ -403,7 +403,20 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     className: "orgchart-container ".concat(exporting ? 'exporting-chart-container ' : '', " ").concat(containerClass),
     onWheel: zoom ? zoomHandler : undefined,
     onMouseUp: pan && panning ? panEndHandler : undefined
-  }, /*#__PURE__*/_react.default.createElement("div", {
+  }, /*#__PURE__*/_react.default.createElement("link", {
+    rel: "stylesheet",
+    href: "https://use.fontawesome.com/releases/v5.6.1/css/all.css",
+    integrity: "sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP",
+    crossorigin: "anonymous"
+  }), /*#__PURE__*/_react.default.createElement("a", {
+    class: "btn zoom"
+  }, /*#__PURE__*/_react.default.createElement("i", {
+    class: "fas fa-search-plus"
+  })), /*#__PURE__*/_react.default.createElement("a", {
+    class: "btn zoom-out"
+  }, /*#__PURE__*/_react.default.createElement("i", {
+    class: "fas fa-search-minus"
+  })), /*#__PURE__*/_react.default.createElement("div", {
     ref: chart,
     className: "orgchart ".concat(exporting ? 'exporting-chart ' : '', " ").concat(chartClass),
     style: {
