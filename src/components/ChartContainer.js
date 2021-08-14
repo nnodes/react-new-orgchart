@@ -69,7 +69,7 @@ const ChartContainer = forwardRef(
       x: 0,
       y: 0,
     });
-    const [zoom, setZoom] = useState('');
+    const [zoom, setZoom] = useState(1);
 
     const attachRel = (data, flags) => {
       data.relationship =
@@ -121,8 +121,8 @@ const ChartContainer = forwardRef(
       const dx = e.clientX - pos.x;
       const dy = e.clientY - pos.y;
 
-      current.container.scrollTop = pos.top - dy;
-      current.container.scrollLeft = pos.left - dx;
+      container.current.scrollTop = pos.top - dy;
+      container.current.scrollLeft = pos.left - dx;
 
       console.warn(
         'aca debo manejar el pan considerando e.clientX',
@@ -140,8 +140,8 @@ const ChartContainer = forwardRef(
         return;
       } else {
         setPos({
-          left: current.container.scrollLeft,
-          top: current.container.scrollTop,
+          left: container.current.scrollLeft,
+          top: container.current.scrollTop,
           x: e.clientX,
           y: e.clientY,
         });
@@ -203,17 +203,15 @@ const ChartContainer = forwardRef(
     useImperativeHandle(ref, () => ({
       zoomIn: (amount = 0.01) => {
         const newZoom = zoom + amount;
-        if (newZoom >= minZoom && newZoom > 0) {
+        if (newZoom <= maxZoom) {
           chart.current.style.transform = `scale(${newZoom})`;
-          console.warn('voy a poner zoom de', newZoom);
           setZoom(newZoom);
         }
       },
       zoomOut: (amount = 0.01) => {
         const newZoom = zoom - amount;
-        if (newZoom <= maxZoom) {
+        if (newZoom > 0) {
           chart.current.style.transform = `scale(${newZoom})`;
-          console.warn('voy a poner zoom de', newZoom);
           setZoom(newZoom);
         }
       },

@@ -115,7 +115,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       pos = _useState8[0],
       setPos = _useState8[1];
 
-  var _useState9 = (0, _react.useState)(''),
+  var _useState9 = (0, _react.useState)(1),
       _useState10 = _slicedToArray(_useState9, 2),
       zoom = _useState10[0],
       setZoom = _useState10[1];
@@ -173,8 +173,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     // }
     var dx = e.clientX - pos.x;
     var dy = e.clientY - pos.y;
-    current.container.scrollTop = pos.top - dy;
-    current.container.scrollLeft = pos.left - dx;
+    container.current.scrollTop = pos.top - dy;
+    container.current.scrollLeft = pos.left - dx;
     console.warn('aca debo manejar el pan considerando e.clientX', e.clientX, 'e.clientY', e.clientY, 'y pos', pos);
   };
 
@@ -184,8 +184,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       return;
     } else {
       setPos({
-        left: current.container.scrollLeft,
-        top: current.container.scrollTop,
+        left: container.current.scrollLeft,
+        top: container.current.scrollTop,
         x: e.clientX,
         y: e.clientY
       });
@@ -274,9 +274,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
         var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.01;
         var newZoom = zoom + amount;
 
-        if (newZoom >= minZoom && newZoom > 0) {
+        if (newZoom <= maxZoom) {
           chart.current.style.transform = "scale(".concat(newZoom, ")");
-          console.warn('voy a poner zoom de', newZoom);
           setZoom(newZoom);
         }
       },
@@ -284,9 +283,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
         var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.01;
         var newZoom = zoom - amount;
 
-        if (newZoom <= maxZoom) {
+        if (newZoom > 0) {
           chart.current.style.transform = "scale(".concat(newZoom, ")");
-          console.warn('voy a poner zoom de', newZoom);
           setZoom(newZoom);
         }
       },
