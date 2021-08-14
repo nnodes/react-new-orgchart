@@ -317,14 +317,11 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
             width = height * aspectRatio;
           }
 
-          base64SvgToBase64Png(canvas, width, height, exportFilename);
-          setExporting(false);
-          container.current.scrollLeft = originalScrollLeft;
-          container.current.scrollTop = originalScrollTop;
-        }, function () {
-          setExporting(false);
-          container.current.scrollLeft = originalScrollLeft;
-          container.current.scrollTop = originalScrollTop;
+          base64SvgToBase64Png(canvas, width, height, exportFilename).then(function () {
+            setExporting(false);
+            container.current.scrollLeft = originalScrollLeft;
+            container.current.scrollTop = originalScrollTop;
+          });
         });
       },
       expandAllNodes: function expandAllNodes() {
@@ -355,12 +352,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     multipleSelect: multipleSelect,
     changeHierarchy: changeHierarchy,
     onClickNode: onClickNode
-  }))), /*#__PURE__*/_react.default.createElement("a", {
-    className: "oc-download-btn hidden",
-    ref: downloadButton,
-    href: dataURL,
-    download: download
-  }, "\xA0"), /*#__PURE__*/_react.default.createElement("div", {
+  }))), /*#__PURE__*/_react.default.createElement("div", {
     className: "oc-mask ".concat(exporting ? '' : 'hidden')
   }, /*#__PURE__*/_react.default.createElement("i", {
     className: "oci oci-spinner spinner"

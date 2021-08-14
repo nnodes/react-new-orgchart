@@ -234,31 +234,27 @@ const ChartContainer = forwardRef(
               clonedDoc.querySelector('.orgchart').style.transform = '';
             },
           })
-          .then(
-            (canvas) => {
-              let width, height;
-              const aspectRatio =
-                chart.current.scrollWidth / chart.current.scrollHeight;
+          .then((canvas) => {
+            let width, height;
+            const aspectRatio =
+              chart.current.scrollWidth / chart.current.scrollHeight;
 
-              if (aspectRatio > 1) {
-                width = Math.min(chart.current.scrollWidth, 16384);
-                height = width / aspectRatio;
-              } else {
-                height = Math.min(chart.current.scrollHeight, 16384);
-                width = height * aspectRatio;
-              }
-
-              base64SvgToBase64Png(canvas, width, height, exportFilename);
-              setExporting(false);
-              container.current.scrollLeft = originalScrollLeft;
-              container.current.scrollTop = originalScrollTop;
-            },
-            () => {
-              setExporting(false);
-              container.current.scrollLeft = originalScrollLeft;
-              container.current.scrollTop = originalScrollTop;
+            if (aspectRatio > 1) {
+              width = Math.min(chart.current.scrollWidth, 16384);
+              height = width / aspectRatio;
+            } else {
+              height = Math.min(chart.current.scrollHeight, 16384);
+              width = height * aspectRatio;
             }
-          );
+
+            base64SvgToBase64Png(canvas, width, height, exportFilename).then(
+              () => {
+                setExporting(false);
+                container.current.scrollLeft = originalScrollLeft;
+                container.current.scrollTop = originalScrollTop;
+              }
+            );
+          });
       },
       expandAllNodes: () => {
         chart.current
@@ -307,14 +303,14 @@ const ChartContainer = forwardRef(
             />
           </ul>
         </div>
-        <a
+        {/* <a
           className="oc-download-btn hidden"
           ref={downloadButton}
           href={dataURL}
           download={download}
         >
           &nbsp;
-        </a>
+        </a> */}
         <div className={`oc-mask ${exporting ? '' : 'hidden'}`}>
           <i className="oci oci-spinner spinner"></i>
         </div>
