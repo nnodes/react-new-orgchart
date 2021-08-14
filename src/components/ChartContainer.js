@@ -58,7 +58,6 @@ const ChartContainer = forwardRef(
   ) => {
     const container = useRef();
     const chart = useRef();
-    const downloadButton = useRef();
 
     const [panning, setPanning] = useState(false);
     const [cursor, setCursor] = useState('default');
@@ -104,50 +103,22 @@ const ChartContainer = forwardRef(
     };
 
     const panHandler = (e) => {
-      // let newX = 0;
-      // let newY = 0;
-      // if (!e.targetTouches) {
-      //   // pand on desktop
-      //   newX = e.pageX - startX;
-      //   newY = e.pageY - startY;
-      // } else if (e.targetTouches.length === 1) {
-      //   // pan on mobile device
-      //   newX = e.targetTouches[0].pageX - startX;
-      //   newY = e.targetTouches[0].pageY - startY;
-      // } else if (e.targetTouches.length > 1) {
-      //   return;
-      // }
-
       const dx = e.clientX - pos.x;
       const dy = e.clientY - pos.y;
 
       container.current.scrollTop = pos.top - dy;
       container.current.scrollLeft = pos.left - dx;
-
-      console.warn(
-        'aca debo manejar el pan considerando e.clientX',
-        e.clientX,
-        'e.clientY',
-        e.clientY,
-        'y pos',
-        pos
-      );
     };
 
     const panStartHandler = (e) => {
-      if (e.target.closest('.oc-node')) {
-        setPanning(false);
-        return;
-      } else {
-        setPos({
-          left: container.current.scrollLeft,
-          top: container.current.scrollTop,
-          x: e.clientX,
-          y: e.clientY,
-        });
-        setPanning(true);
-        setCursor('grab');
-      }
+      setPos({
+        left: container.current.scrollLeft,
+        top: container.current.scrollTop,
+        x: e.clientX,
+        y: e.clientY,
+      });
+      setPanning(true);
+      setCursor('grab');
     };
 
     const changeHierarchy = async (draggedItemData, dropTargetId) => {
@@ -276,6 +247,8 @@ const ChartContainer = forwardRef(
           exporting ? 'exporting-chart-container ' : ''
         } ${containerClass}`}
         onMouseUp={pan && panning ? panEndHandler : undefined}
+        onMouseDown={pan ? panStartHandler : undefined}
+        onMouseMove={pan && panning ? panHandler : undefined}
       >
         <div
           ref={chart}
@@ -286,8 +259,6 @@ const ChartContainer = forwardRef(
             cursor: cursor,
           }}
           onClick={clickChartHandler}
-          onMouseDown={pan ? panStartHandler : undefined}
-          onMouseMove={pan && panning ? panHandler : undefined}
         >
           <ul>
             <ChartNode
@@ -301,14 +272,6 @@ const ChartContainer = forwardRef(
             />
           </ul>
         </div>
-        {/* <a
-          className="oc-download-btn hidden"
-          ref={downloadButton}
-          href={dataURL}
-          download={download}
-        >
-          &nbsp;
-        </a> */}
         <div className={`oc-mask ${exporting ? '' : 'hidden'}`}>
           <i className="oci oci-spinner spinner"></i>
         </div>
