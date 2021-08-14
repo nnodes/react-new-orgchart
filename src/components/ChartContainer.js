@@ -15,8 +15,8 @@ import './ChartContainer.css';
 const propTypes = {
   datasource: PropTypes.object.isRequired,
   pan: PropTypes.bool,
-  zoomoutLimit: PropTypes.number,
-  zoominLimit: PropTypes.number,
+  minZoom: PropTypes.number,
+  maxZoom: PropTypes.number,
   containerClass: PropTypes.string,
   chartClass: PropTypes.string,
   NodeTemplate: PropTypes.elementType,
@@ -29,8 +29,8 @@ const propTypes = {
 
 const defaultProps = {
   pan: false,
-  zoomoutLimit: 0.5,
-  zoominLimit: 7,
+  minZoom: 0.5,
+  maxZoom: 7,
   containerClass: '',
   chartClass: '',
   draggable: false,
@@ -43,8 +43,8 @@ const ChartContainer = forwardRef(
     {
       datasource,
       pan,
-      zoomoutLimit,
-      zoominLimit,
+      minZoom,
+      maxZoom,
       containerClass,
       chartClass,
       NodeTemplate,
@@ -60,13 +60,15 @@ const ChartContainer = forwardRef(
     const chart = useRef();
     const downloadButton = useRef();
 
-    const [startX, setStartX] = useState(0);
-    const [startY, setStartY] = useState(0);
     const [panning, setPanning] = useState(false);
     const [cursor, setCursor] = useState('default');
     const [exporting, setExporting] = useState(false);
-    const [dataURL, setDataURL] = useState('');
-    const [download, setDownload] = useState('');
+    const [pos, setPos] = useState({
+      left: 0,
+      top: 0,
+      x: 0,
+      y: 0,
+    });
     const [zoom, setZoom] = useState('');
 
     const attachRel = (data, flags) => {
@@ -102,36 +104,49 @@ const ChartContainer = forwardRef(
     };
 
     const panHandler = (e) => {
-      let newX = 0;
-      let newY = 0;
-      if (!e.targetTouches) {
-        // pand on desktop
-        newX = e.pageX - startX;
-        newY = e.pageY - startY;
-      } else if (e.targetTouches.length === 1) {
-        // pan on mobile device
-        newX = e.targetTouches[0].pageX - startX;
-        newY = e.targetTouches[0].pageY - startY;
-      } else if (e.targetTouches.length > 1) {
-        return;
-      }
+      // let newX = 0;
+      // let newY = 0;
+      // if (!e.targetTouches) {
+      //   // pand on desktop
+      //   newX = e.pageX - startX;
+      //   newY = e.pageY - startY;
+      // } else if (e.targetTouches.length === 1) {
+      //   // pan on mobile device
+      //   newX = e.targetTouches[0].pageX - startX;
+      //   newY = e.targetTouches[0].pageY - startY;
+      // } else if (e.targetTouches.length > 1) {
+      //   return;
+      // }
+
+      const dx = e.clientX - pos.x;
+      const dy = e.clientY - pos.y;
+
+      current.container.scrollTop = pos.top - dy;
+      current.container.scrollLeft = pos.left - dx;
+
       console.warn(
-        'aca debo manejar el pan considerando newX',
-        newX,
-        'newY',
-        newY
+        'aca debo manejar el pan considerando e.clientX',
+        e.clientX,
+        'e.clientY',
+        e.clientY,
+        'y pos',
+        pos
       );
     };
 
     const panStartHandler = (e) => {
       if (e.target.closest('.oc-node')) {
-        console.warn('no estoy paneando.');
         setPanning(false);
         return;
       } else {
-        console.warn('estoy paneando!!');
+        setPos({
+          left: current.container.scrollLeft,
+          top: current.container.scrollTop,
+          x: e.clientX,
+          y: e.clientY,
+        });
         setPanning(true);
-        setCursor('move');
+        setCursor('grab');
       }
     };
 
@@ -188,15 +203,19 @@ const ChartContainer = forwardRef(
     useImperativeHandle(ref, () => ({
       zoomIn: (amount = 0.01) => {
         const newZoom = zoom + amount;
-        chart.current.transform = `scale(${newZoom})`;
-        console.warn('voy a poner zoom de', newZoom);
-        setZoom(newZoom);
+        if (newZoom >= minZoom && newZoom > 0) {
+          chart.current.style.transform = `scale(${newZoom})`;
+          console.warn('voy a poner zoom de', newZoom);
+          setZoom(newZoom);
+        }
       },
       zoomOut: (amount = 0.01) => {
         const newZoom = zoom - amount;
-        chart.current.transform = `scale(${newZoom})`;
-        console.warn('voy a poner zoom de', newZoom);
-        setZoom(newZoom);
+        if (newZoom <= maxZoom) {
+          chart.current.style.transform = `scale(${newZoom})`;
+          console.warn('voy a poner zoom de', newZoom);
+          setZoom(newZoom);
+        }
       },
       exportTo: (exportFilename) => {
         exportFilename = exportFilename || 'OrgChart';

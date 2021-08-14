@@ -52,8 +52,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var propTypes = {
   datasource: _propTypes.default.object.isRequired,
   pan: _propTypes.default.bool,
-  zoomoutLimit: _propTypes.default.number,
-  zoominLimit: _propTypes.default.number,
+  minZoom: _propTypes.default.number,
+  maxZoom: _propTypes.default.number,
   containerClass: _propTypes.default.string,
   chartClass: _propTypes.default.string,
   NodeTemplate: _propTypes.default.elementType,
@@ -65,8 +65,8 @@ var propTypes = {
 };
 var defaultProps = {
   pan: false,
-  zoomoutLimit: 0.5,
-  zoominLimit: 7,
+  minZoom: 0.5,
+  maxZoom: 7,
   containerClass: '',
   chartClass: '',
   draggable: false,
@@ -76,8 +76,8 @@ var defaultProps = {
 var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var datasource = _ref.datasource,
       pan = _ref.pan,
-      zoomoutLimit = _ref.zoomoutLimit,
-      zoominLimit = _ref.zoominLimit,
+      minZoom = _ref.minZoom,
+      maxZoom = _ref.maxZoom,
       containerClass = _ref.containerClass,
       chartClass = _ref.chartClass,
       NodeTemplate = _ref.NodeTemplate,
@@ -90,45 +90,35 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var chart = (0, _react.useRef)();
   var downloadButton = (0, _react.useRef)();
 
-  var _useState = (0, _react.useState)(0),
+  var _useState = (0, _react.useState)(false),
       _useState2 = _slicedToArray(_useState, 2),
-      startX = _useState2[0],
-      setStartX = _useState2[1];
+      panning = _useState2[0],
+      setPanning = _useState2[1];
 
-  var _useState3 = (0, _react.useState)(0),
+  var _useState3 = (0, _react.useState)('default'),
       _useState4 = _slicedToArray(_useState3, 2),
-      startY = _useState4[0],
-      setStartY = _useState4[1];
+      cursor = _useState4[0],
+      setCursor = _useState4[1];
 
   var _useState5 = (0, _react.useState)(false),
       _useState6 = _slicedToArray(_useState5, 2),
-      panning = _useState6[0],
-      setPanning = _useState6[1];
+      exporting = _useState6[0],
+      setExporting = _useState6[1];
 
-  var _useState7 = (0, _react.useState)('default'),
+  var _useState7 = (0, _react.useState)({
+    left: 0,
+    top: 0,
+    x: 0,
+    y: 0
+  }),
       _useState8 = _slicedToArray(_useState7, 2),
-      cursor = _useState8[0],
-      setCursor = _useState8[1];
+      pos = _useState8[0],
+      setPos = _useState8[1];
 
-  var _useState9 = (0, _react.useState)(false),
+  var _useState9 = (0, _react.useState)(''),
       _useState10 = _slicedToArray(_useState9, 2),
-      exporting = _useState10[0],
-      setExporting = _useState10[1];
-
-  var _useState11 = (0, _react.useState)(''),
-      _useState12 = _slicedToArray(_useState11, 2),
-      dataURL = _useState12[0],
-      setDataURL = _useState12[1];
-
-  var _useState13 = (0, _react.useState)(''),
-      _useState14 = _slicedToArray(_useState13, 2),
-      download = _useState14[0],
-      setDownload = _useState14[1];
-
-  var _useState15 = (0, _react.useState)(''),
-      _useState16 = _slicedToArray(_useState15, 2),
-      zoom = _useState16[0],
-      setZoom = _useState16[1];
+      zoom = _useState10[0],
+      setZoom = _useState10[1];
 
   var attachRel = function attachRel(data, flags) {
     data.relationship = flags + (data.children && data.children.length > 0 ? 1 : 0);
@@ -142,10 +132,10 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     return data;
   };
 
-  var _useState17 = (0, _react.useState)(datasource),
-      _useState18 = _slicedToArray(_useState17, 2),
-      ds = _useState18[0],
-      setDS = _useState18[1];
+  var _useState11 = (0, _react.useState)(datasource),
+      _useState12 = _slicedToArray(_useState11, 2),
+      ds = _useState12[0],
+      setDS = _useState12[1];
 
   (0, _react.useEffect)(function () {
     setDS(datasource);
@@ -168,33 +158,39 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   };
 
   var panHandler = function panHandler(e) {
-    var newX = 0;
-    var newY = 0;
-
-    if (!e.targetTouches) {
-      // pand on desktop
-      newX = e.pageX - startX;
-      newY = e.pageY - startY;
-    } else if (e.targetTouches.length === 1) {
-      // pan on mobile device
-      newX = e.targetTouches[0].pageX - startX;
-      newY = e.targetTouches[0].pageY - startY;
-    } else if (e.targetTouches.length > 1) {
-      return;
-    }
-
-    console.warn('aca debo manejar el pan considerando newX', newX, 'newY', newY);
+    // let newX = 0;
+    // let newY = 0;
+    // if (!e.targetTouches) {
+    //   // pand on desktop
+    //   newX = e.pageX - startX;
+    //   newY = e.pageY - startY;
+    // } else if (e.targetTouches.length === 1) {
+    //   // pan on mobile device
+    //   newX = e.targetTouches[0].pageX - startX;
+    //   newY = e.targetTouches[0].pageY - startY;
+    // } else if (e.targetTouches.length > 1) {
+    //   return;
+    // }
+    var dx = e.clientX - pos.x;
+    var dy = e.clientY - pos.y;
+    current.container.scrollTop = pos.top - dy;
+    current.container.scrollLeft = pos.left - dx;
+    console.warn('aca debo manejar el pan considerando e.clientX', e.clientX, 'e.clientY', e.clientY, 'y pos', pos);
   };
 
   var panStartHandler = function panStartHandler(e) {
     if (e.target.closest('.oc-node')) {
-      console.warn('no estoy paneando.');
       setPanning(false);
       return;
     } else {
-      console.warn('estoy paneando!!');
+      setPos({
+        left: current.container.scrollLeft,
+        top: current.container.scrollTop,
+        x: e.clientX,
+        y: e.clientY
+      });
       setPanning(true);
-      setCursor('move');
+      setCursor('grab');
     }
   };
 
@@ -277,16 +273,22 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       zoomIn: function zoomIn() {
         var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.01;
         var newZoom = zoom + amount;
-        chart.current.transform = "scale(".concat(newZoom, ")");
-        console.warn('voy a poner zoom de', newZoom);
-        setZoom(newZoom);
+
+        if (newZoom >= minZoom && newZoom > 0) {
+          chart.current.style.transform = "scale(".concat(newZoom, ")");
+          console.warn('voy a poner zoom de', newZoom);
+          setZoom(newZoom);
+        }
       },
       zoomOut: function zoomOut() {
         var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.01;
         var newZoom = zoom - amount;
-        chart.current.transform = "scale(".concat(newZoom, ")");
-        console.warn('voy a poner zoom de', newZoom);
-        setZoom(newZoom);
+
+        if (newZoom <= maxZoom) {
+          chart.current.style.transform = "scale(".concat(newZoom, ")");
+          console.warn('voy a poner zoom de', newZoom);
+          setZoom(newZoom);
+        }
       },
       exportTo: function exportTo(exportFilename) {
         exportFilename = exportFilename || 'OrgChart';
