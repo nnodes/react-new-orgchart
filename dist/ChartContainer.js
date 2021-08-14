@@ -408,8 +408,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     className: "orgchart ".concat(exporting ? 'exporting-chart ' : '', " ").concat(chartClass),
     style: {
       transform: transform,
-      cursor: cursor,
-      transformOrigin: '0px 0px'
+      cursor: cursor
     },
     onClick: clickChartHandler,
     onMouseDown: pan ? panStartHandler : undefined,

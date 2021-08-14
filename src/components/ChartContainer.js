@@ -328,7 +328,6 @@ const ChartContainer = forwardRef(
           style={{
             transform: transform,
             cursor: cursor,
-            transformOrigin: '0px 0px',
           }}
           onClick={clickChartHandler}
           onMouseDown={pan ? panStartHandler : undefined}

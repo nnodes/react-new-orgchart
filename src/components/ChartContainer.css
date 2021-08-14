@@ -17,7 +17,7 @@
 }
 
 .orgchart {
-  transform-origin: 0 0 !important;
+  transform-origin: top left;
   box-sizing: border-box;
   display: inline-block;
   background-image: linear-gradient(
