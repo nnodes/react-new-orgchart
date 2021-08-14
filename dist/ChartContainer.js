@@ -52,7 +52,6 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var propTypes = {
   datasource: _propTypes.default.object.isRequired,
   pan: _propTypes.default.bool,
-  zoom: _propTypes.default.bool,
   zoomoutLimit: _propTypes.default.number,
   zoominLimit: _propTypes.default.number,
   containerClass: _propTypes.default.string,
@@ -66,7 +65,6 @@ var propTypes = {
 };
 var defaultProps = {
   pan: false,
-  zoom: false,
   zoomoutLimit: 0.5,
   zoominLimit: 7,
   containerClass: '',
@@ -78,7 +76,6 @@ var defaultProps = {
 var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var datasource = _ref.datasource,
       pan = _ref.pan,
-      zoom = _ref.zoom,
       zoomoutLimit = _ref.zoomoutLimit,
       zoominLimit = _ref.zoominLimit,
       containerClass = _ref.containerClass,
@@ -103,35 +100,35 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       startY = _useState4[0],
       setStartY = _useState4[1];
 
-  var _useState5 = (0, _react.useState)(''),
+  var _useState5 = (0, _react.useState)(false),
       _useState6 = _slicedToArray(_useState5, 2),
-      transform = _useState6[0],
-      setTransform = _useState6[1];
+      panning = _useState6[0],
+      setPanning = _useState6[1];
 
-  var _useState7 = (0, _react.useState)(false),
+  var _useState7 = (0, _react.useState)('default'),
       _useState8 = _slicedToArray(_useState7, 2),
-      panning = _useState8[0],
-      setPanning = _useState8[1];
+      cursor = _useState8[0],
+      setCursor = _useState8[1];
 
-  var _useState9 = (0, _react.useState)('default'),
+  var _useState9 = (0, _react.useState)(false),
       _useState10 = _slicedToArray(_useState9, 2),
-      cursor = _useState10[0],
-      setCursor = _useState10[1];
+      exporting = _useState10[0],
+      setExporting = _useState10[1];
 
-  var _useState11 = (0, _react.useState)(false),
+  var _useState11 = (0, _react.useState)(''),
       _useState12 = _slicedToArray(_useState11, 2),
-      exporting = _useState12[0],
-      setExporting = _useState12[1];
+      dataURL = _useState12[0],
+      setDataURL = _useState12[1];
 
   var _useState13 = (0, _react.useState)(''),
       _useState14 = _slicedToArray(_useState13, 2),
-      dataURL = _useState14[0],
-      setDataURL = _useState14[1];
+      download = _useState14[0],
+      setDownload = _useState14[1];
 
   var _useState15 = (0, _react.useState)(''),
       _useState16 = _slicedToArray(_useState15, 2),
-      download = _useState16[0],
-      setDownload = _useState16[1];
+      zoom = _useState16[0],
+      setZoom = _useState16[1];
 
   var attachRel = function attachRel(data, flags) {
     data.relationship = flags + (data.children && data.children.length > 0 ? 1 : 0);
@@ -186,96 +183,19 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       return;
     }
 
-    if (transform === '') {
-      if (transform.indexOf('3d') === -1) {
-        setTransform('matrix(1,0,0,1,' + newX + ',' + newY + ')');
-      } else {
-        setTransform('matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,' + newX + ', ' + newY + ',0,1)');
-      }
-    } else {
-      var matrix = transform.split(',');
-
-      if (transform.indexOf('3d') === -1) {
-        matrix[4] = newX;
-        matrix[5] = newY + ')';
-      } else {
-        matrix[12] = newX;
-        matrix[13] = newY;
-      }
-
-      setTransform(matrix.join(','));
-    }
+    console.warn('aca debo manejar el pan considerando newX', newX, 'newY', newY);
   };
 
   var panStartHandler = function panStartHandler(e) {
     if (e.target.closest('.oc-node')) {
+      console.warn('no estoy paneando.');
       setPanning(false);
       return;
     } else {
+      console.warn('estoy paneando!!');
       setPanning(true);
       setCursor('move');
     }
-
-    var lastX = 0;
-    var lastY = 0;
-
-    if (transform !== '') {
-      var matrix = transform.split(',');
-
-      if (transform.indexOf('3d') === -1) {
-        lastX = parseInt(matrix[4]);
-        lastY = parseInt(matrix[5]);
-      } else {
-        lastX = parseInt(matrix[12]);
-        lastY = parseInt(matrix[13]);
-      }
-    }
-
-    if (!e.targetTouches) {
-      // pand on desktop
-      setStartX(e.pageX - lastX);
-      setStartY(e.pageY - lastY);
-    } else if (e.targetTouches.length === 1) {
-      // pan on mobile device
-      setStartX(e.targetTouches[0].pageX - lastX);
-      setStartY(e.targetTouches[0].pageY - lastY);
-    } else if (e.targetTouches.length > 1) {
-      return;
-    }
-  };
-
-  var updateChartScale = function updateChartScale(newScale) {
-    var matrix = [];
-    var targetScale = 1;
-
-    if (transform === '') {
-      setTransform('matrix(' + newScale + ', 0, 0, ' + newScale + ', 0, 0)');
-    } else {
-      matrix = transform.split(',');
-
-      if (transform.indexOf('3d') === -1) {
-        targetScale = Math.abs(window.parseFloat(matrix[3]) * newScale);
-
-        if (targetScale > zoomoutLimit && targetScale < zoominLimit) {
-          matrix[0] = 'matrix(' + targetScale;
-          matrix[3] = targetScale;
-          setTransform(matrix.join(','));
-        }
-      } else {
-        targetScale = Math.abs(window.parseFloat(matrix[5]) * newScale);
-
-        if (targetScale > zoomoutLimit && targetScale < zoominLimit) {
-          matrix[0] = 'matrix3d(' + targetScale;
-          matrix[5] = targetScale;
-          setTransform(matrix.join(','));
-        }
-      }
-    }
-  };
-
-  var zoomHandler = function zoomHandler(e) {
-    var newScale = 1 + (e.deltaY > 0 ? -0.01 : 0.01);
-    updateChartScale(newScale);
   };
 
   var changeHierarchy = /*#__PURE__*/function () {
@@ -354,6 +274,20 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
 
   (0, _react.useImperativeHandle)(ref, function () {
     return {
+      zoomIn: function zoomIn() {
+        var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.01;
+        var newZoom = zoom + amount;
+        chart.current.transform = "scale(".concat(newZoom, ")");
+        console.warn('voy a poner zoom de', newZoom);
+        setZoom(newZoom);
+      },
+      zoomOut: function zoomOut() {
+        var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.01;
+        var newZoom = zoom - amount;
+        chart.current.transform = "scale(".concat(newZoom, ")");
+        console.warn('voy a poner zoom de', newZoom);
+        setZoom(newZoom);
+      },
       exportTo: function exportTo(exportFilename) {
         exportFilename = exportFilename || 'OrgChart';
         setExporting(true);
@@ -401,13 +335,11 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   return /*#__PURE__*/_react.default.createElement("div", {
     ref: container,
     className: "orgchart-container ".concat(exporting ? 'exporting-chart-container ' : '', " ").concat(containerClass),
-    onWheel: zoom ? zoomHandler : undefined,
     onMouseUp: pan && panning ? panEndHandler : undefined
   }, /*#__PURE__*/_react.default.createElement("div", {
     ref: chart,
     className: "orgchart ".concat(exporting ? 'exporting-chart ' : '', " ").concat(chartClass),
     style: {
-      transform: transform,
       cursor: cursor
     },
     onClick: clickChartHandler,

@@ -15,7 +15,6 @@ import './ChartContainer.css';
 const propTypes = {
   datasource: PropTypes.object.isRequired,
   pan: PropTypes.bool,
-  zoom: PropTypes.bool,
   zoomoutLimit: PropTypes.number,
   zoominLimit: PropTypes.number,
   containerClass: PropTypes.string,
@@ -30,7 +29,6 @@ const propTypes = {
 
 const defaultProps = {
   pan: false,
-  zoom: false,
   zoomoutLimit: 0.5,
   zoominLimit: 7,
   containerClass: '',
@@ -45,7 +43,6 @@ const ChartContainer = forwardRef(
     {
       datasource,
       pan,
-      zoom,
       zoomoutLimit,
       zoominLimit,
       containerClass,
@@ -65,12 +62,12 @@ const ChartContainer = forwardRef(
 
     const [startX, setStartX] = useState(0);
     const [startY, setStartY] = useState(0);
-    const [transform, setTransform] = useState('');
     const [panning, setPanning] = useState(false);
     const [cursor, setCursor] = useState('default');
     const [exporting, setExporting] = useState(false);
     const [dataURL, setDataURL] = useState('');
     const [download, setDownload] = useState('');
+    const [zoom, setZoom] = useState('');
 
     const attachRel = (data, flags) => {
       data.relationship =
@@ -118,88 +115,24 @@ const ChartContainer = forwardRef(
       } else if (e.targetTouches.length > 1) {
         return;
       }
-      if (transform === '') {
-        if (transform.indexOf('3d') === -1) {
-          setTransform('matrix(1,0,0,1,' + newX + ',' + newY + ')');
-        } else {
-          setTransform(
-            'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,' + newX + ', ' + newY + ',0,1)'
-          );
-        }
-      } else {
-        let matrix = transform.split(',');
-        if (transform.indexOf('3d') === -1) {
-          matrix[4] = newX;
-          matrix[5] = newY + ')';
-        } else {
-          matrix[12] = newX;
-          matrix[13] = newY;
-        }
-        setTransform(matrix.join(','));
-      }
+      console.warn(
+        'aca debo manejar el pan considerando newX',
+        newX,
+        'newY',
+        newY
+      );
     };
 
     const panStartHandler = (e) => {
       if (e.target.closest('.oc-node')) {
+        console.warn('no estoy paneando.');
         setPanning(false);
         return;
       } else {
+        console.warn('estoy paneando!!');
         setPanning(true);
         setCursor('move');
       }
-      let lastX = 0;
-      let lastY = 0;
-      if (transform !== '') {
-        let matrix = transform.split(',');
-        if (transform.indexOf('3d') === -1) {
-          lastX = parseInt(matrix[4]);
-          lastY = parseInt(matrix[5]);
-        } else {
-          lastX = parseInt(matrix[12]);
-          lastY = parseInt(matrix[13]);
-        }
-      }
-      if (!e.targetTouches) {
-        // pand on desktop
-        setStartX(e.pageX - lastX);
-        setStartY(e.pageY - lastY);
-      } else if (e.targetTouches.length === 1) {
-        // pan on mobile device
-        setStartX(e.targetTouches[0].pageX - lastX);
-        setStartY(e.targetTouches[0].pageY - lastY);
-      } else if (e.targetTouches.length > 1) {
-        return;
-      }
-    };
-
-    const updateChartScale = (newScale) => {
-      let matrix = [];
-      let targetScale = 1;
-      if (transform === '') {
-        setTransform('matrix(' + newScale + ', 0, 0, ' + newScale + ', 0, 0)');
-      } else {
-        matrix = transform.split(',');
-        if (transform.indexOf('3d') === -1) {
-          targetScale = Math.abs(window.parseFloat(matrix[3]) * newScale);
-          if (targetScale > zoomoutLimit && targetScale < zoominLimit) {
-            matrix[0] = 'matrix(' + targetScale;
-            matrix[3] = targetScale;
-            setTransform(matrix.join(','));
-          }
-        } else {
-          targetScale = Math.abs(window.parseFloat(matrix[5]) * newScale);
-          if (targetScale > zoomoutLimit && targetScale < zoominLimit) {
-            matrix[0] = 'matrix3d(' + targetScale;
-            matrix[5] = targetScale;
-            setTransform(matrix.join(','));
-          }
-        }
-      }
-    };
-
-    const zoomHandler = (e) => {
-      let newScale = 1 + (e.deltaY > 0 ? -0.01 : 0.01);
-      updateChartScale(newScale);
     };
 
     const changeHierarchy = async (draggedItemData, dropTargetId) => {
@@ -253,6 +186,18 @@ const ChartContainer = forwardRef(
     }
 
     useImperativeHandle(ref, () => ({
+      zoomIn: (amount = 0.01) => {
+        const newZoom = zoom + amount;
+        chart.current.transform = `scale(${newZoom})`;
+        console.warn('voy a poner zoom de', newZoom);
+        setZoom(newZoom);
+      },
+      zoomOut: (amount = 0.01) => {
+        const newZoom = zoom - amount;
+        chart.current.transform = `scale(${newZoom})`;
+        console.warn('voy a poner zoom de', newZoom);
+        setZoom(newZoom);
+      },
       exportTo: (exportFilename) => {
         exportFilename = exportFilename || 'OrgChart';
         setExporting(true);
@@ -317,7 +262,6 @@ const ChartContainer = forwardRef(
         className={`orgchart-container ${
           exporting ? 'exporting-chart-container ' : ''
         } ${containerClass}`}
-        onWheel={zoom ? zoomHandler : undefined}
         onMouseUp={pan && panning ? panEndHandler : undefined}
       >
         <div
@@ -326,7 +270,6 @@ const ChartContainer = forwardRef(
             exporting ? 'exporting-chart ' : ''
           } ${chartClass}`}
           style={{
-            transform: transform,
             cursor: cursor,
           }}
           onClick={clickChartHandler}
