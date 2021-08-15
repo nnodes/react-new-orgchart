@@ -175,13 +175,10 @@ var ChartNode = function ChartNode(_ref) {
       var _actionNode$classList;
 
       // 向下折叠，则折叠所有祖先节点以及祖先节点的兄弟节点
+      toggleSiblings(actionNode);
       var isSiblingsCollapsed = Array.from(actionNode.parentNode.children).some(function (item) {
         return item.classList.contains('hidden');
       });
-
-      if (!isSiblingsCollapsed && toggleableSiblings) {
-        toggleSiblings(actionNode);
-      }
 
       (_actionNode$classList = actionNode.classList).add.apply(_actionNode$classList, _toConsumableArray(('isAncestorsCollapsed' + (isSiblingsCollapsed ? '' : ' isSiblingsCollapsed')).split(' ')));
 
@@ -316,13 +313,13 @@ var ChartNode = function ChartNode(_ref) {
     className: "oc-edge verticalEdge topEdge oci ".concat(topEdgeExpanded === undefined ? '' : topEdgeExpanded ? 'oci-chevron-down' : 'oci-chevron-up'),
     onClick: topEdgeClickHandler
   }), collapsible && datasource.relationship && datasource.relationship.charAt(1) === '1' && /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement("i", {
-    className: "oc-edge horizontalEdge rightEdge oci ".concat(rightEdgeExpanded === undefined ? '' : rightEdgeExpanded ? 'oci-chevron-left' : 'oci-chevron-right'),
+    className: "oc-edge horizontalEdge rightEdge oci ".concat(rightEdgeExpanded === undefined ? '' : rightEdgeExpanded ? 'oci-chevron-left' : 'oci-chevron-right', " ").concat(toggleableSiblings ? '' : 'hidden'),
     onClick: hEdgeClickHandler
   }), /*#__PURE__*/_react.default.createElement("i", {
     className: "oc-edge horizontalEdge leftEdge oci ".concat(leftEdgeExpanded === undefined ? '' : leftEdgeExpanded ? 'oci-chevron-right' : 'oci-chevron-left', " ").concat(toggleableSiblings ? '' : 'hidden'),
     onClick: hEdgeClickHandler
   })), collapsible && datasource.relationship && datasource.relationship.charAt(2) === '1' && /*#__PURE__*/_react.default.createElement("i", {
-    className: "oc-edge verticalEdge bottomEdge oci ".concat(bottomEdgeExpanded === undefined ? '' : bottomEdgeExpanded ? 'oci-chevron-up' : 'oci-chevron-down', " ").concat(toggleableSiblings ? '' : 'hidden'),
+    className: "oc-edge verticalEdge bottomEdge oci ".concat(bottomEdgeExpanded === undefined ? '' : bottomEdgeExpanded ? 'oci-chevron-up' : 'oci-chevron-down'),
     onClick: bottomEdgeClickHandler
   })), datasource.children && datasource.children.length > 0 && /*#__PURE__*/_react.default.createElement("ul", {
     className: isChildrenCollapsed ? 'hidden' : ''
