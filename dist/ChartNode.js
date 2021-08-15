@@ -171,6 +171,7 @@ var ChartNode = function ChartNode(_ref) {
       // 向上展开，只展开一级
       actionNode.classList.remove('isAncestorsCollapsed');
       node.firstChild.classList.remove('hidden');
+      toggleSiblings(actionNode);
     } else {
       var _actionNode$classList;
 

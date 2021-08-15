@@ -120,6 +120,7 @@ const ChartNode = ({
       // 向上展开，只展开一级
       actionNode.classList.remove('isAncestorsCollapsed');
       node.firstChild.classList.remove('hidden');
+      toggleSiblings(actionNode);
     } else {
       // 向下折叠，则折叠所有祖先节点以及祖先节点的兄弟节点
       const isSiblingsCollapsed = Array.from(
