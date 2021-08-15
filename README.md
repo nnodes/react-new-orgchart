@@ -1,20 +1,17 @@
-![OrgChart](http://dabeng.github.io/OrgChart/img/heading.svg)
+![OrgChart](https://randomthimgs.blob.core.windows.net/randomthimgs/lomgo.png)
 
-# [jQuery Version](https://github.com/dabeng/OrgChart)
-# [ES6 Version](http://github.com/dabeng/OrgChart.js)
-# [Web Components Version](http://github.com/dabeng/OrgChart-Webcomponents)
-# [Vue.js Version](https://github.com/dabeng/vue-orgchart)
-# [Angular Version -- the most space-saving solution](https://github.com/dabeng/ng-orgchart)
+## Why use this fork?
 
-## Features
-- expand/collapse nodes
-- Allows user to change orgchart structure by drag/drop nodes
-- Allows user to edit orgchart
-- Supports exporting chart as a picture or pdf document
-- Supports pan and zoom
-- Allows user to customize the internal structure for every node
+- Panning is now drag-to-scroll based, deprecating the transform CSS property logic. This avoids [scrolling and visualization issues](https://stackoverflow.com/questions/45512317/css-transform-origin-center-overflow-scroll-not-full-width) when rendering a large OrgChart.
+
+- Zooming is now scale() based. The main benefit of this change is that the ChartContainer module is simpler and easier to read when compared to the transformation-matrix splitting shenanigans.
+
+- Orgchart downloading is now handled by the dom-to-image library. Dom-to-image has [better predictability when dealing with large images](https://stackoverflow.com/questions/43755750/div-or-html-to-image-alternative-to-html2canvas), [doesn't screw up your snapshot when scrolling](https://stackoverflow.com/questions/36213275/html2canvas-does-not-render-full-div-only-what-is-visible-on-screen), and [is 70x faster](https://betterprogramming.pub/heres-why-i-m-replacing-html2canvas-with-html-to-image-in-our-react-app-d8da0b85eadf).
+
+- Canvas maximum size limits are taken into account. Due to browser limitations, rendering a canvas with dimensions greater than 16384x16384 will result in a faulty, cropped snapshot. Thus, exporting a bulky OrgChart wasn't really possible. I solved this by scaling down any drawn images larger than the limit.
 
 ## Props
+
 <table>
   <thead>
     <tr>
@@ -92,21 +89,22 @@
       <td>If true, the chart can be zoomed.</td>
     </tr>
     <tr>
-      <td>zoominLimit</td>
+      <td>maxZoom</td>
       <td>number</td>
       <td>7</td>
-      <td>User can zoom the chart at different scales(0.5~7).</td>
+      <td>Represents the maximum possible zoom of the orgchart.</td>
     </tr>
     <tr>
-      <td>zoomoutLimit</td>
+      <td>minZoom</td>
       <td>number</td>
       <td>0.5</td>
-      <td>User can zoom the chart at different scales(0.5~7).</td>
+      <td>Represents the minimum possible zoom of the orgchart.</td>
     </tr>
   </tbody>
 </table>
 
 ## Methods
+
 <table>
   <thead>
     <tr>
@@ -121,83 +119,25 @@
     </tr>
     <tr>
       <td>exportTo</td>
-      <td>User can use this method to export orgchart to png org pdf file. Sample code: orgchartRef.current.exportTo(filename, fileextension)</td>
+      <td>User can use this method to export orgchart to png orge. Sample code: orgchartRef.current.exportTo(filename)</td>
+    </tr>
+    <tr>
+      <td>zoomIn(amount)</td>
+      <td>
+        User can use this method to zoom-in on the orgchart div. Default zoom amount is 0.05.
+      </td>
+    </tr>
+    <tr>
+      <td>zoomIn(amount)</td>
+      <td>
+      User can use this method to zoom-out on the orgchart div. Default zoom amount is 0.05. 
+      </td>
     </tr>
   </tbody>
 </table>
 
 ## Install
+
 ```
-npm install @dabeng/react-orgchart
+npm install @jearaneda/react-orgchart
 ```
-
-## [Demo](https://codesandbox.io/s/react-orgchart-demo-o3nf6)
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify

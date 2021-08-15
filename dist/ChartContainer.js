@@ -251,7 +251,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   (0, _react.useImperativeHandle)(ref, function () {
     return {
       zoomIn: function zoomIn() {
-        var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.01;
+        var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.05;
         var newZoom = zoom + amount;
 
         if (newZoom <= maxZoom) {
@@ -260,7 +260,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
         }
       },
       zoomOut: function zoomOut() {
-        var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.01;
+        var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.05;
         var newZoom = zoom - amount;
 
         if (newZoom > 0) {
@@ -312,15 +312,15 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   return /*#__PURE__*/_react.default.createElement("div", {
     ref: container,
     className: "orgchart-container ".concat(exporting ? 'exporting-chart-container ' : '', " ").concat(containerClass),
+    style: {
+      cursor: cursor
+    },
     onMouseUp: pan && panning ? panEndHandler : undefined,
     onMouseDown: pan ? panStartHandler : undefined,
     onMouseMove: pan && panning ? panHandler : undefined
   }, /*#__PURE__*/_react.default.createElement("div", {
     ref: chart,
     className: "orgchart ".concat(exporting ? 'exporting-chart ' : '', " ").concat(chartClass),
-    style: {
-      cursor: cursor
-    },
     onClick: clickChartHandler
   }, /*#__PURE__*/_react.default.createElement("ul", null, /*#__PURE__*/_react.default.createElement(_ChartNode.default, {
     datasource: attachRel(ds, '00'),

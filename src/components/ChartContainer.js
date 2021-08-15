@@ -172,14 +172,14 @@ const ChartContainer = forwardRef(
     }
 
     useImperativeHandle(ref, () => ({
-      zoomIn: (amount = 0.01) => {
+      zoomIn: (amount = 0.05) => {
         const newZoom = zoom + amount;
         if (newZoom <= maxZoom) {
           chart.current.style.transform = `scale(${newZoom})`;
           setZoom(newZoom);
         }
       },
-      zoomOut: (amount = 0.01) => {
+      zoomOut: (amount = 0.05) => {
         const newZoom = zoom - amount;
         if (newZoom > 0) {
           chart.current.style.transform = `scale(${newZoom})`;
@@ -246,6 +246,9 @@ const ChartContainer = forwardRef(
         className={`orgchart-container ${
           exporting ? 'exporting-chart-container ' : ''
         } ${containerClass}`}
+        style={{
+          cursor: cursor,
+        }}
         onMouseUp={pan && panning ? panEndHandler : undefined}
         onMouseDown={pan ? panStartHandler : undefined}
         onMouseMove={pan && panning ? panHandler : undefined}
@@ -255,9 +258,6 @@ const ChartContainer = forwardRef(
           className={`orgchart ${
             exporting ? 'exporting-chart ' : ''
           } ${chartClass}`}
-          style={{
-            cursor: cursor,
-          }}
           onClick={clickChartHandler}
         >
           <ul>
