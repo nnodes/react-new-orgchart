@@ -175,10 +175,13 @@ var ChartNode = function ChartNode(_ref) {
       var _actionNode$classList;
 
       // 向下折叠，则折叠所有祖先节点以及祖先节点的兄弟节点
-      toggleSiblings(actionNode);
       var isSiblingsCollapsed = Array.from(actionNode.parentNode.children).some(function (item) {
         return item.classList.contains('hidden');
       });
+
+      if (!isSiblingsCollapsed) {
+        toggleSiblings(actionNode);
+      }
 
       (_actionNode$classList = actionNode.classList).add.apply(_actionNode$classList, _toConsumableArray(('isAncestorsCollapsed' + (isSiblingsCollapsed ? '' : ' isSiblingsCollapsed')).split(' ')));
 
