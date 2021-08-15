@@ -230,6 +230,9 @@ const ChartContainer = forwardRef(
                 container.current.scrollTop = originalScrollTop;
               }
             );
+          })
+          .catch(() => {
+            setExporting(false);
           });
       },
       expandAllNodes: () => {

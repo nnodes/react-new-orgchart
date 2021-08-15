@@ -307,6 +307,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
             container.current.scrollLeft = originalScrollLeft;
             container.current.scrollTop = originalScrollTop;
           });
+        }).catch(function () {
+          setExporting(false);
         });
       },
       expandAllNodes: function expandAllNodes() {
