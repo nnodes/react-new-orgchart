@@ -55,6 +55,7 @@ const ChartContainer = forwardRef(
       multipleSelect,
       onClickNode,
       onClickChart,
+      toggleableSiblings,
     },
     ref
   ) => {
@@ -187,7 +188,7 @@ const ChartContainer = forwardRef(
       },
       zoomOut: (amount = 0.05) => {
         const newZoom = zoom - amount;
-        if (newZoom > 0) {
+        if (newZoom > 0 && newZoom > minZoom) {
           chart.current.style.transform = `scale(${newZoom})`;
           setZoom(newZoom);
         }

@@ -87,7 +87,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       collapsible = _ref.collapsible,
       multipleSelect = _ref.multipleSelect,
       onClickNode = _ref.onClickNode,
-      onClickChart = _ref.onClickChart;
+      onClickChart = _ref.onClickChart,
+      toggleableSiblings = _ref.toggleableSiblings;
   var container = (0, _react.useRef)();
   var chart = (0, _react.useRef)();
 
@@ -269,7 +270,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
         var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.05;
         var newZoom = zoom - amount;
 
-        if (newZoom > 0) {
+        if (newZoom > 0 && newZoom > minZoom) {
           chart.current.style.transform = "scale(".concat(newZoom, ")");
           setZoom(newZoom);
         }
