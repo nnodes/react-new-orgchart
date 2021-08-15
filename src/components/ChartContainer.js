@@ -8,7 +8,7 @@ import React, {
 import PropTypes from 'prop-types';
 import { selectNodeService } from './service';
 import JSONDigger from 'json-digger';
-import domtoimage from 'dom-to-image';
+import domtoimage from '@jearaneda/dom-to-image';
 import ChartNode from './ChartNode';
 import './ChartContainer.css';
 

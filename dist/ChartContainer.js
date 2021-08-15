@@ -15,7 +15,7 @@ var _service = require("./service");
 
 var _jsonDigger = _interopRequireDefault(require("json-digger"));
 
-var _domToImage = _interopRequireDefault(require("dom-to-image"));
+var _domToImage = _interopRequireDefault(require("@jearaneda/dom-to-image"));
 
 var _ChartNode = _interopRequireDefault(require("./ChartNode"));
 
