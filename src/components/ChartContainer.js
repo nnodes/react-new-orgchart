@@ -25,6 +25,7 @@ const propTypes = {
   multipleSelect: PropTypes.bool,
   onClickNode: PropTypes.func,
   onClickChart: PropTypes.func,
+  toggleableSiblings: PropTypes.bool,
 };
 
 const defaultProps = {
@@ -36,6 +37,7 @@ const defaultProps = {
   draggable: false,
   collapsible: true,
   multipleSelect: false,
+  toggleableSiblings: true,
 };
 
 const ChartContainer = forwardRef(
@@ -172,6 +174,10 @@ const ChartContainer = forwardRef(
     }
 
     useImperativeHandle(ref, () => ({
+      resetZoom: () => {
+        chart.current.style.transform = `scale(${1})`;
+        setZoom(1);
+      },
       zoomIn: (amount = 0.05) => {
         const newZoom = zoom + amount;
         if (newZoom <= maxZoom) {
@@ -269,6 +275,7 @@ const ChartContainer = forwardRef(
               multipleSelect={multipleSelect}
               changeHierarchy={changeHierarchy}
               onClickNode={onClickNode}
+              toggleableSiblings={toggleableSiblings}
             />
           </ul>
         </div>

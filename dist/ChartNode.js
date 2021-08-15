@@ -54,12 +54,14 @@ var propTypes = {
   collapsible: _propTypes.default.bool,
   multipleSelect: _propTypes.default.bool,
   changeHierarchy: _propTypes.default.func,
-  onClickNode: _propTypes.default.func
+  onClickNode: _propTypes.default.func,
+  toggleableSiblings: _propTypes.default.bool
 };
 var defaultProps = {
   draggable: false,
   collapsible: true,
-  multipleSelect: false
+  multipleSelect: false,
+  toggleableSiblings: false
 };
 
 var ChartNode = function ChartNode(_ref) {
@@ -69,7 +71,8 @@ var ChartNode = function ChartNode(_ref) {
       collapsible = _ref.collapsible,
       multipleSelect = _ref.multipleSelect,
       changeHierarchy = _ref.changeHierarchy,
-      onClickNode = _ref.onClickNode;
+      onClickNode = _ref.onClickNode,
+      toggleableSiblings = _ref.toggleableSiblings;
   var node = (0, _react.useRef)();
 
   var _useState = (0, _react.useState)(false),
@@ -107,13 +110,13 @@ var ChartNode = function ChartNode(_ref) {
       selected = _useState14[0],
       setSelected = _useState14[1];
 
-  var nodeClass = ["oc-node", isChildrenCollapsed ? "isChildrenCollapsed" : "", allowedDrop ? "allowedDrop" : "", selected ? "selected" : ""].filter(function (item) {
+  var nodeClass = ['oc-node', isChildrenCollapsed ? 'isChildrenCollapsed' : '', allowedDrop ? 'allowedDrop' : '', selected ? 'selected' : ''].filter(function (item) {
     return item;
-  }).join(" ");
+  }).join(' ');
   (0, _react.useEffect)(function () {
     var subs1 = _service.dragNodeService.getDragInfo().subscribe(function (draggedInfo) {
       if (draggedInfo) {
-        setAllowedDrop(!document.querySelector("#" + draggedInfo.draggedNodeId).closest("li").querySelector("#" + node.current.id) ? true : false);
+        setAllowedDrop(!document.querySelector('#' + draggedInfo.draggedNodeId).closest('li').querySelector('#' + node.current.id) ? true : false);
       } else {
         setAllowedDrop(false);
       }
@@ -140,11 +143,11 @@ var ChartNode = function ChartNode(_ref) {
   }, [multipleSelect, datasource]);
 
   var addArrows = function addArrows(e) {
-    var node = e.target.closest("li");
-    var parent = node.parentNode.closest("li");
-    var isAncestorsCollapsed = node && parent ? parent.firstChild.classList.contains("hidden") : undefined;
+    var node = e.target.closest('li');
+    var parent = node.parentNode.closest('li');
+    var isAncestorsCollapsed = node && parent ? parent.firstChild.classList.contains('hidden') : undefined;
     var isSiblingsCollapsed = Array.from(node.parentNode.children).some(function (item) {
-      return item.classList.contains("hidden");
+      return item.classList.contains('hidden');
     });
     setTopEdgeExpanded(!isAncestorsCollapsed);
     setRightEdgeExpanded(!isSiblingsCollapsed);
@@ -160,31 +163,31 @@ var ChartNode = function ChartNode(_ref) {
   };
 
   var toggleAncestors = function toggleAncestors(actionNode) {
-    var node = actionNode.parentNode.closest("li");
+    var node = actionNode.parentNode.closest('li');
     if (!node) return;
-    var isAncestorsCollapsed = node.firstChild.classList.contains("hidden");
+    var isAncestorsCollapsed = node.firstChild.classList.contains('hidden');
 
     if (isAncestorsCollapsed) {
       // 向上展开，只展开一级
-      actionNode.classList.remove("isAncestorsCollapsed");
-      node.firstChild.classList.remove("hidden");
+      actionNode.classList.remove('isAncestorsCollapsed');
+      node.firstChild.classList.remove('hidden');
     } else {
       var _actionNode$classList;
 
       // 向下折叠，则折叠所有祖先节点以及祖先节点的兄弟节点
       var isSiblingsCollapsed = Array.from(actionNode.parentNode.children).some(function (item) {
-        return item.classList.contains("hidden");
+        return item.classList.contains('hidden');
       });
 
-      if (!isSiblingsCollapsed) {
+      if (!isSiblingsCollapsed && toggleableSiblings) {
         toggleSiblings(actionNode);
       }
 
-      (_actionNode$classList = actionNode.classList).add.apply(_actionNode$classList, _toConsumableArray(("isAncestorsCollapsed" + (isSiblingsCollapsed ? "" : " isSiblingsCollapsed")).split(" ")));
+      (_actionNode$classList = actionNode.classList).add.apply(_actionNode$classList, _toConsumableArray(('isAncestorsCollapsed' + (isSiblingsCollapsed ? '' : ' isSiblingsCollapsed')).split(' ')));
 
-      node.firstChild.classList.add("hidden"); // 如果还有展开的祖先节点，那继续折叠关闭之
+      node.firstChild.classList.add('hidden'); // 如果还有展开的祖先节点，那继续折叠关闭之
 
-      if (node.parentNode.closest("li") && !node.parentNode.closest("li").firstChild.classList.contains("hidden")) {
+      if (node.parentNode.closest('li') && !node.parentNode.closest('li').firstChild.classList.contains('hidden')) {
         toggleAncestors(node);
       }
     }
@@ -193,7 +196,7 @@ var ChartNode = function ChartNode(_ref) {
   var topEdgeClickHandler = function topEdgeClickHandler(e) {
     e.stopPropagation();
     setTopEdgeExpanded(!topEdgeExpanded);
-    toggleAncestors(e.target.closest("li"));
+    toggleAncestors(e.target.closest('li'));
   };
 
   var bottomEdgeClickHandler = function bottomEdgeClickHandler(e) {
@@ -205,15 +208,15 @@ var ChartNode = function ChartNode(_ref) {
   var toggleSiblings = function toggleSiblings(actionNode) {
     var node = actionNode.previousSibling;
     var isSiblingsCollapsed = Array.from(actionNode.parentNode.children).some(function (item) {
-      return item.classList.contains("hidden");
+      return item.classList.contains('hidden');
     });
-    actionNode.classList.toggle("isSiblingsCollapsed", !isSiblingsCollapsed); // 先处理同级的兄弟节点
+    actionNode.classList.toggle('isSiblingsCollapsed', !isSiblingsCollapsed); // 先处理同级的兄弟节点
 
     while (node) {
       if (isSiblingsCollapsed) {
-        node.classList.remove("hidden");
+        node.classList.remove('hidden');
       } else {
-        node.classList.add("hidden");
+        node.classList.add('hidden');
       }
 
       node = node.previousSibling;
@@ -223,16 +226,16 @@ var ChartNode = function ChartNode(_ref) {
 
     while (node) {
       if (isSiblingsCollapsed) {
-        node.classList.remove("hidden");
+        node.classList.remove('hidden');
       } else {
-        node.classList.add("hidden");
+        node.classList.add('hidden');
       }
 
       node = node.nextSibling;
     } // 在展开兄弟节点的同时，还要展开父节点
 
 
-    var isAncestorsCollapsed = actionNode.parentNode.closest("li").firstChild.classList.contains("hidden");
+    var isAncestorsCollapsed = actionNode.parentNode.closest('li').firstChild.classList.contains('hidden');
 
     if (isAncestorsCollapsed) {
       toggleAncestors(actionNode);
@@ -243,7 +246,7 @@ var ChartNode = function ChartNode(_ref) {
     e.stopPropagation();
     setLeftEdgeExpanded(!leftEdgeExpanded);
     setRightEdgeExpanded(!rightEdgeExpanded);
-    toggleSiblings(e.target.closest("li"));
+    if (toggleableSiblings) toggleSiblings(e.target.closest('li'));
   };
 
   var filterAllowedDropNodes = function filterAllowedDropNodes(id) {
@@ -262,7 +265,7 @@ var ChartNode = function ChartNode(_ref) {
     var copyDS = _objectSpread({}, datasource);
 
     delete copyDS.relationship;
-    event.dataTransfer.setData("text/plain", JSON.stringify(copyDS)); // highlight all potential drop targets
+    event.dataTransfer.setData('text/plain', JSON.stringify(copyDS)); // highlight all potential drop targets
 
     filterAllowedDropNodes(node.current.id);
   };
@@ -278,13 +281,13 @@ var ChartNode = function ChartNode(_ref) {
   };
 
   var dropHandler = function dropHandler(event) {
-    if (!event.currentTarget.classList.contains("allowedDrop")) {
+    if (!event.currentTarget.classList.contains('allowedDrop')) {
       return;
     }
 
     _service.dragNodeService.clearDragInfo();
 
-    changeHierarchy(JSON.parse(event.dataTransfer.getData("text/plain")), event.currentTarget.id);
+    changeHierarchy(JSON.parse(event.dataTransfer.getData('text/plain')), event.currentTarget.id);
   };
 
   return /*#__PURE__*/_react.default.createElement("li", {
@@ -293,7 +296,7 @@ var ChartNode = function ChartNode(_ref) {
     ref: node,
     id: datasource.id,
     className: nodeClass,
-    draggable: draggable ? "true" : undefined,
+    draggable: draggable ? 'true' : undefined,
     onClick: clickNodeHandler,
     onDragStart: dragstartHandler,
     onDragOver: dragoverHandler,
@@ -305,24 +308,24 @@ var ChartNode = function ChartNode(_ref) {
     nodeData: datasource
   }) : /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement("div", {
     className: "oc-heading"
-  }, datasource.relationship && datasource.relationship.charAt(2) === "1" && /*#__PURE__*/_react.default.createElement("i", {
+  }, datasource.relationship && datasource.relationship.charAt(2) === '1' && /*#__PURE__*/_react.default.createElement("i", {
     className: "oci oci-leader oc-symbol"
   }), datasource.name), /*#__PURE__*/_react.default.createElement("div", {
     className: "oc-content"
-  }, datasource.title)), collapsible && datasource.relationship && datasource.relationship.charAt(0) === "1" && /*#__PURE__*/_react.default.createElement("i", {
-    className: "oc-edge verticalEdge topEdge oci ".concat(topEdgeExpanded === undefined ? "" : topEdgeExpanded ? "oci-chevron-down" : "oci-chevron-up"),
+  }, datasource.title)), collapsible && datasource.relationship && datasource.relationship.charAt(0) === '1' && /*#__PURE__*/_react.default.createElement("i", {
+    className: "oc-edge verticalEdge topEdge oci ".concat(topEdgeExpanded === undefined ? '' : topEdgeExpanded ? 'oci-chevron-down' : 'oci-chevron-up'),
     onClick: topEdgeClickHandler
-  }), collapsible && datasource.relationship && datasource.relationship.charAt(1) === "1" && /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement("i", {
-    className: "oc-edge horizontalEdge rightEdge oci ".concat(rightEdgeExpanded === undefined ? "" : rightEdgeExpanded ? "oci-chevron-left" : "oci-chevron-right"),
+  }), collapsible && datasource.relationship && datasource.relationship.charAt(1) === '1' && /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement("i", {
+    className: "oc-edge horizontalEdge rightEdge oci ".concat(rightEdgeExpanded === undefined ? '' : rightEdgeExpanded ? 'oci-chevron-left' : 'oci-chevron-right'),
     onClick: hEdgeClickHandler
   }), /*#__PURE__*/_react.default.createElement("i", {
-    className: "oc-edge horizontalEdge leftEdge oci ".concat(leftEdgeExpanded === undefined ? "" : leftEdgeExpanded ? "oci-chevron-right" : "oci-chevron-left"),
+    className: "oc-edge horizontalEdge leftEdge oci ".concat(leftEdgeExpanded === undefined ? '' : leftEdgeExpanded ? 'oci-chevron-right' : 'oci-chevron-left', " ").concat(toggleableSiblings ? '' : 'hidden'),
     onClick: hEdgeClickHandler
-  })), collapsible && datasource.relationship && datasource.relationship.charAt(2) === "1" && /*#__PURE__*/_react.default.createElement("i", {
-    className: "oc-edge verticalEdge bottomEdge oci ".concat(bottomEdgeExpanded === undefined ? "" : bottomEdgeExpanded ? "oci-chevron-up" : "oci-chevron-down"),
+  })), collapsible && datasource.relationship && datasource.relationship.charAt(2) === '1' && /*#__PURE__*/_react.default.createElement("i", {
+    className: "oc-edge verticalEdge bottomEdge oci ".concat(bottomEdgeExpanded === undefined ? '' : bottomEdgeExpanded ? 'oci-chevron-up' : 'oci-chevron-down', " ").concat(toggleableSiblings ? '' : 'hidden'),
     onClick: bottomEdgeClickHandler
   })), datasource.children && datasource.children.length > 0 && /*#__PURE__*/_react.default.createElement("ul", {
-    className: isChildrenCollapsed ? "hidden" : ""
+    className: isChildrenCollapsed ? 'hidden' : ''
   }, datasource.children.map(function (node) {
     return /*#__PURE__*/_react.default.createElement(ChartNode, {
       datasource: node,
@@ -333,7 +336,8 @@ var ChartNode = function ChartNode(_ref) {
       collapsible: collapsible,
       multipleSelect: multipleSelect,
       changeHierarchy: changeHierarchy,
-      onClickNode: onClickNode
+      onClickNode: onClickNode,
+      toggleableSiblings: toggleableSiblings
     });
   })));
 };

@@ -4,7 +4,7 @@
 
 - Panning is now drag-to-scroll based, deprecating the transform CSS property logic. This avoids [scrolling and visualization issues](https://stackoverflow.com/questions/45512317/css-transform-origin-center-overflow-scroll-not-full-width) when rendering a large OrgChart.
 
-- Zooming is now scale() based. The main benefit of this change is that the ChartContainer module is simpler and easier to read when compared to the transformation-matrix splitting shenanigans.
+- Zooming is now scale() based. The main benefit of this change is that the ChartContainer module is simpler and easier to read when compared to the transformation-matrix splitting shenanigans. Using zoom() was a good enough alternative, but it is non-standard.
 
 - Orgchart downloading is now handled by the dom-to-image library. Dom-to-image has [better predictability when dealing with large images](https://stackoverflow.com/questions/43755750/div-or-html-to-image-alternative-to-html2canvas), [doesn't screw up your snapshot when scrolling](https://stackoverflow.com/questions/36213275/html2canvas-does-not-render-full-div-only-what-is-visible-on-screen), and [is 70x faster](https://betterprogramming.pub/heres-why-i-m-replacing-html2canvas-with-html-to-image-in-our-react-app-d8da0b85eadf).
 
@@ -100,6 +100,12 @@
       <td>0.5</td>
       <td>Represents the minimum possible zoom of the orgchart.</td>
     </tr>
+    <tr>
+      <td>toggleableSiblings</td>
+      <td>boolean</td>
+      <td>true</td>
+      <td>Whether or not siblings should be toggleable. If false, also hides horizontal arrows.</td>
+    </tr>
   </tbody>
 </table>
 
@@ -133,11 +139,17 @@
       User can use this method to zoom-out on the orgchart div. Default zoom amount is 0.05. 
       </td>
     </tr>
+    <tr>
+      <td>resetZoom()</td>
+      <td>
+      Resets zoom to 1.
+      </td>
+    </tr>
   </tbody>
 </table>
 
 ## Install
 
 ```
-npm install @jearaneda/react-orgchart
+npm install https://github.com/jearaneda/react-orgchart
 ```

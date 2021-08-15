@@ -61,7 +61,8 @@ var propTypes = {
   collapsible: _propTypes.default.bool,
   multipleSelect: _propTypes.default.bool,
   onClickNode: _propTypes.default.func,
-  onClickChart: _propTypes.default.func
+  onClickChart: _propTypes.default.func,
+  toggleableSiblings: _propTypes.default.bool
 };
 var defaultProps = {
   pan: false,
@@ -71,7 +72,8 @@ var defaultProps = {
   chartClass: '',
   draggable: false,
   collapsible: true,
-  multipleSelect: false
+  multipleSelect: false,
+  toggleableSiblings: true
 };
 var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var datasource = _ref.datasource,
@@ -250,6 +252,10 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
 
   (0, _react.useImperativeHandle)(ref, function () {
     return {
+      resetZoom: function resetZoom() {
+        chart.current.style.transform = "scale(".concat(1, ")");
+        setZoom(1);
+      },
       zoomIn: function zoomIn() {
         var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.05;
         var newZoom = zoom + amount;
@@ -329,7 +335,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     collapsible: collapsible,
     multipleSelect: multipleSelect,
     changeHierarchy: changeHierarchy,
-    onClickNode: onClickNode
+    onClickNode: onClickNode,
+    toggleableSiblings: toggleableSiblings
   }))), /*#__PURE__*/_react.default.createElement("div", {
     className: "oc-mask ".concat(exporting ? '' : 'hidden')
   }, /*#__PURE__*/_react.default.createElement("i", {
