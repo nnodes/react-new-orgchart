@@ -36,7 +36,7 @@
     ]
   },
   "dependencies": {
-    "dom-to-image": "git+https://github.com/jearaneda/dom-to-image.git",
+    "@jearaneda/dom-to-image": "^2.6.0",
     "json-digger": "^1.1.5",
     "rxjs": "^6.5.4"
   },
