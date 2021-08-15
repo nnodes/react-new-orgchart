@@ -151,5 +151,5 @@
 ## Install
 
 ```
-npm install https://github.com/jearaneda/react-orgchart
+npm install https://github.com/jearaneda/react-new-orgchart
 ```
