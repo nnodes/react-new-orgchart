@@ -106,6 +106,18 @@
       <td>true</td>
       <td>Whether or not siblings should be toggleable. If false, also hides horizontal arrows.</td>
     </tr>
+    <tr>
+      <td>loading</td>
+      <td>boolean</td>
+      <td>false</td>
+      <td>Use this prop to trigger OrgChart's spinner on-demand.</td>
+    </tr>
+    <tr>
+      <td>defaultZoom</td>
+      <td>number</td>
+      <td>0.5</td>
+      <td>Set the initial zoom.</td>
+    </tr>
   </tbody>
 </table>
 

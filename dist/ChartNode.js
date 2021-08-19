@@ -75,42 +75,37 @@ var ChartNode = function ChartNode(_ref) {
       toggleableSiblings = _ref.toggleableSiblings;
   var node = (0, _react.useRef)();
 
-  var _useState = (0, _react.useState)(false),
+  var _useState = (0, _react.useState)(),
       _useState2 = _slicedToArray(_useState, 2),
-      isChildrenCollapsed = _useState2[0],
-      setIsChildrenCollapsed = _useState2[1];
+      topEdgeExpanded = _useState2[0],
+      setTopEdgeExpanded = _useState2[1];
 
   var _useState3 = (0, _react.useState)(),
       _useState4 = _slicedToArray(_useState3, 2),
-      topEdgeExpanded = _useState4[0],
-      setTopEdgeExpanded = _useState4[1];
+      rightEdgeExpanded = _useState4[0],
+      setRightEdgeExpanded = _useState4[1];
 
   var _useState5 = (0, _react.useState)(),
       _useState6 = _slicedToArray(_useState5, 2),
-      rightEdgeExpanded = _useState6[0],
-      setRightEdgeExpanded = _useState6[1];
+      bottomEdgeExpanded = _useState6[0],
+      setBottomEdgeExpanded = _useState6[1];
 
   var _useState7 = (0, _react.useState)(),
       _useState8 = _slicedToArray(_useState7, 2),
-      bottomEdgeExpanded = _useState8[0],
-      setBottomEdgeExpanded = _useState8[1];
+      leftEdgeExpanded = _useState8[0],
+      setLeftEdgeExpanded = _useState8[1];
 
-  var _useState9 = (0, _react.useState)(),
+  var _useState9 = (0, _react.useState)(false),
       _useState10 = _slicedToArray(_useState9, 2),
-      leftEdgeExpanded = _useState10[0],
-      setLeftEdgeExpanded = _useState10[1];
+      allowedDrop = _useState10[0],
+      setAllowedDrop = _useState10[1];
 
   var _useState11 = (0, _react.useState)(false),
       _useState12 = _slicedToArray(_useState11, 2),
-      allowedDrop = _useState12[0],
-      setAllowedDrop = _useState12[1];
+      selected = _useState12[0],
+      setSelected = _useState12[1];
 
-  var _useState13 = (0, _react.useState)(false),
-      _useState14 = _slicedToArray(_useState13, 2),
-      selected = _useState14[0],
-      setSelected = _useState14[1];
-
-  var nodeClass = ['oc-node', isChildrenCollapsed ? 'isChildrenCollapsed' : '', allowedDrop ? 'allowedDrop' : '', selected ? 'selected' : ''].filter(function (item) {
+  var nodeClass = ['oc-node', allowedDrop ? 'allowedDrop' : '', selected ? 'selected' : ''].filter(function (item) {
     return item;
   }).join(' ');
   (0, _react.useEffect)(function () {
@@ -149,6 +144,9 @@ var ChartNode = function ChartNode(_ref) {
     var isSiblingsCollapsed = Array.from(node.parentNode.children).some(function (item) {
       return item.classList.contains('hidden');
     });
+    var children = node.children[1];
+    var isChildrenCollapsed = false;
+    if (children) isChildrenCollapsed = children.classList.contains('hidden');
     setTopEdgeExpanded(!isAncestorsCollapsed);
     setRightEdgeExpanded(!isSiblingsCollapsed);
     setLeftEdgeExpanded(!isSiblingsCollapsed);
@@ -200,9 +198,20 @@ var ChartNode = function ChartNode(_ref) {
     toggleAncestors(e.target.closest('li'));
   };
 
+  var toggleChildren = function toggleChildren(actionNode) {
+    var node = actionNode.target.closest('li');
+    var children = node.children[1];
+    var isChildrenCollapsed = false;
+    if (children) isChildrenCollapsed = children.classList.contains('hidden');
+
+    if (isChildrenCollapsed) {
+      children.classList.remove('hidden');
+    } else children.classList.add('hidden');
+  };
+
   var bottomEdgeClickHandler = function bottomEdgeClickHandler(e) {
     e.stopPropagation();
-    setIsChildrenCollapsed(!isChildrenCollapsed);
+    toggleChildren(e);
     setBottomEdgeExpanded(!bottomEdgeExpanded);
   };
 
@@ -326,7 +335,7 @@ var ChartNode = function ChartNode(_ref) {
     className: "oc-edge verticalEdge bottomEdge oci ".concat(bottomEdgeExpanded === undefined ? '' : bottomEdgeExpanded ? 'oci-chevron-up' : 'oci-chevron-down'),
     onClick: bottomEdgeClickHandler
   })), datasource.children && datasource.children.length > 0 && /*#__PURE__*/_react.default.createElement("ul", {
-    className: isChildrenCollapsed ? 'hidden' : ''
+    className: "oc-children"
   }, datasource.children.map(function (node) {
     return /*#__PURE__*/_react.default.createElement(ChartNode, {
       datasource: node,

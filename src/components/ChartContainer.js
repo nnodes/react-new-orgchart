@@ -17,6 +17,7 @@ const propTypes = {
   pan: PropTypes.bool,
   minZoom: PropTypes.number,
   maxZoom: PropTypes.number,
+  defaultZoom: PropTypes.number,
   containerClass: PropTypes.string,
   chartClass: PropTypes.string,
   NodeTemplate: PropTypes.elementType,
@@ -26,18 +27,21 @@ const propTypes = {
   onClickNode: PropTypes.func,
   onClickChart: PropTypes.func,
   toggleableSiblings: PropTypes.bool,
+  loading: PropTypes.bool,
 };
 
 const defaultProps = {
   pan: false,
-  minZoom: 0.5,
-  maxZoom: 7,
+  minZoom: 0.1,
+  maxZoom: 3,
+  defaultZoom: 0.5,
   containerClass: '',
   chartClass: '',
   draggable: false,
   collapsible: true,
   multipleSelect: false,
   toggleableSiblings: true,
+  loading: false,
 };
 
 const ChartContainer = forwardRef(
@@ -47,6 +51,7 @@ const ChartContainer = forwardRef(
       pan,
       minZoom,
       maxZoom,
+      defaultZoom,
       containerClass,
       chartClass,
       NodeTemplate,
@@ -56,6 +61,7 @@ const ChartContainer = forwardRef(
       onClickNode,
       onClickChart,
       toggleableSiblings,
+      loading,
     },
     ref
   ) => {
@@ -72,6 +78,7 @@ const ChartContainer = forwardRef(
       y: 0,
     });
     const [zoom, setZoom] = useState(1);
+    const [ds, setDS] = useState(datasource);
 
     const attachRel = (data, flags) => {
       data.relationship =
@@ -84,7 +91,15 @@ const ChartContainer = forwardRef(
       return data;
     };
 
-    const [ds, setDS] = useState(datasource);
+    const setTransform = (z) => {
+      setZoom(z);
+      return `scale(${z})`;
+    };
+
+    useEffect(() => {
+      chart.current.style.transform = setTransform(defaultZoom);
+    }, []);
+
     useEffect(() => {
       setDS(datasource);
     }, [datasource]);
@@ -174,23 +189,58 @@ const ChartContainer = forwardRef(
       });
     }
 
+    const chartToImage = (
+      exportFilename,
+      originalScrollLeft,
+      originalScrollTop
+    ) => {
+      domtoimage
+        .toSvg(chart.current, {
+          width: chart.current.scrollWidth,
+          height: chart.current.scrollHeight,
+          style: { transform: '' },
+        })
+        .then((canvas) => {
+          let width, height;
+          const aspectRatio =
+            chart.current.scrollWidth / chart.current.scrollHeight;
+
+          if (aspectRatio > 1) {
+            width = Math.min(chart.current.scrollWidth, 16384);
+            height = width / aspectRatio;
+          } else {
+            height = Math.min(chart.current.scrollHeight, 16384);
+            width = height * aspectRatio;
+          }
+
+          base64SvgToBase64Png(canvas, width, height, exportFilename).then(
+            () => {
+              chart.current.style.transform = setTransform(zoom);
+              setExporting(false);
+              container.current.scrollLeft = originalScrollLeft;
+              container.current.scrollTop = originalScrollTop;
+            }
+          );
+        })
+        .catch((e) => {
+          setExporting(false);
+        });
+    };
+
     useImperativeHandle(ref, () => ({
       resetZoom: () => {
-        chart.current.style.transform = `scale(${1})`;
-        setZoom(1);
+        chart.current.style.transform = setTransform(defaultZoom);
       },
       zoomIn: (amount = 0.05) => {
         const newZoom = zoom + amount;
         if (newZoom <= maxZoom) {
-          chart.current.style.transform = `scale(${newZoom})`;
-          setZoom(newZoom);
+          chart.current.style.transform = setTransform(newZoom);
         }
       },
       zoomOut: (amount = 0.05) => {
         const newZoom = zoom - amount;
         if (newZoom > 0 && newZoom > minZoom) {
-          chart.current.style.transform = `scale(${newZoom})`;
-          setZoom(newZoom);
+          chart.current.style.transform = setTransform(newZoom);
         }
       },
       exportTo: (exportFilename) => {
@@ -200,45 +250,14 @@ const ChartContainer = forwardRef(
         container.current.scrollLeft = 0;
         const originalScrollTop = container.current.scrollTop;
         container.current.scrollTop = 0;
-
-        domtoimage
-          .toSvg(chart.current, {
-            width: chart.current.scrollWidth,
-            height: chart.current.scrollHeight,
-            onclone: function (clonedDoc) {
-              clonedDoc.querySelector('.orgchart').style.background = 'none';
-              clonedDoc.querySelector('.orgchart').style.transform = '';
-            },
-          })
-          .then((canvas) => {
-            let width, height;
-            const aspectRatio =
-              chart.current.scrollWidth / chart.current.scrollHeight;
-
-            if (aspectRatio > 1) {
-              width = Math.min(chart.current.scrollWidth, 16384);
-              height = width / aspectRatio;
-            } else {
-              height = Math.min(chart.current.scrollHeight, 16384);
-              width = height * aspectRatio;
-            }
-
-            base64SvgToBase64Png(canvas, width, height, exportFilename).then(
-              () => {
-                setExporting(false);
-                container.current.scrollLeft = originalScrollLeft;
-                container.current.scrollTop = originalScrollTop;
-              }
-            );
-          })
-          .catch(() => {
-            setExporting(false);
-          });
+        setTimeout(function () {
+          chartToImage(exportFilename, originalScrollLeft, originalScrollTop);
+        }, 300);
       },
       expandAllNodes: () => {
         chart.current
           .querySelectorAll(
-            '.oc-node.hidden, .oc-hierarchy.hidden, .isSiblingsCollapsed, .isAncestorsCollapsed'
+            '.oc-node.hidden, .oc-hierarchy.hidden, .isSiblingsCollapsed, .isAncestorsCollapsed, .oc-children.hidden'
           )
           .forEach((el) => {
             el.classList.remove(
@@ -254,7 +273,7 @@ const ChartContainer = forwardRef(
       <div
         ref={container}
         className={`orgchart-container ${
-          exporting ? 'exporting-chart-container ' : ''
+          exporting || loading ? 'exporting-chart-container ' : ''
         } ${containerClass}`}
         style={{
           cursor: cursor,
@@ -266,7 +285,7 @@ const ChartContainer = forwardRef(
         <div
           ref={chart}
           className={`orgchart ${
-            exporting ? 'exporting-chart ' : ''
+            exporting || loading ? 'exporting-chart ' : ''
           } ${chartClass}`}
           onClick={clickChartHandler}
         >
@@ -283,7 +302,7 @@ const ChartContainer = forwardRef(
             />
           </ul>
         </div>
-        <div className={`oc-mask ${exporting ? '' : 'hidden'}`}>
+        <div className={`oc-mask ${exporting || loading ? '' : 'hidden'}`}>
           <i className="oci oci-spinner spinner"></i>
         </div>
       </div>

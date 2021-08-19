@@ -33,7 +33,6 @@ const ChartNode = ({
 }) => {
   const node = useRef();
 
-  const [isChildrenCollapsed, setIsChildrenCollapsed] = useState(false);
   const [topEdgeExpanded, setTopEdgeExpanded] = useState();
   const [rightEdgeExpanded, setRightEdgeExpanded] = useState();
   const [bottomEdgeExpanded, setBottomEdgeExpanded] = useState();
@@ -43,7 +42,6 @@ const ChartNode = ({
 
   const nodeClass = [
     'oc-node',
-    isChildrenCollapsed ? 'isChildrenCollapsed' : '',
     allowedDrop ? 'allowedDrop' : '',
     selected ? 'selected' : '',
   ]
@@ -99,6 +97,10 @@ const ChartNode = ({
       node.parentNode.children
     ).some((item) => item.classList.contains('hidden'));
 
+    const children = node.children[1];
+    let isChildrenCollapsed = false;
+    if (children) isChildrenCollapsed = children.classList.contains('hidden');
+
     setTopEdgeExpanded(!isAncestorsCollapsed);
     setRightEdgeExpanded(!isSiblingsCollapsed);
     setLeftEdgeExpanded(!isSiblingsCollapsed);
@@ -152,9 +154,21 @@ const ChartNode = ({
     toggleAncestors(e.target.closest('li'));
   };
 
+  const toggleChildren = (actionNode) => {
+    const node = actionNode.target.closest('li');
+    const children = node.children[1];
+    let isChildrenCollapsed = false;
+
+    if (children) isChildrenCollapsed = children.classList.contains('hidden');
+
+    if (isChildrenCollapsed) {
+      children.classList.remove('hidden');
+    } else children.classList.add('hidden');
+  };
+
   const bottomEdgeClickHandler = (e) => {
     e.stopPropagation();
-    setIsChildrenCollapsed(!isChildrenCollapsed);
+    toggleChildren(e);
     setBottomEdgeExpanded(!bottomEdgeExpanded);
   };
 
@@ -324,7 +338,7 @@ const ChartNode = ({
           )}
       </div>
       {datasource.children && datasource.children.length > 0 && (
-        <ul className={isChildrenCollapsed ? 'hidden' : ''}>
+        <ul className="oc-children">
           {datasource.children.map((node) => (
             <ChartNode
               datasource={node}

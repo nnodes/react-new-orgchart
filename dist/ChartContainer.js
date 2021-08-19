@@ -54,6 +54,7 @@ var propTypes = {
   pan: _propTypes.default.bool,
   minZoom: _propTypes.default.number,
   maxZoom: _propTypes.default.number,
+  defaultZoom: _propTypes.default.number,
   containerClass: _propTypes.default.string,
   chartClass: _propTypes.default.string,
   NodeTemplate: _propTypes.default.elementType,
@@ -62,24 +63,28 @@ var propTypes = {
   multipleSelect: _propTypes.default.bool,
   onClickNode: _propTypes.default.func,
   onClickChart: _propTypes.default.func,
-  toggleableSiblings: _propTypes.default.bool
+  toggleableSiblings: _propTypes.default.bool,
+  loading: _propTypes.default.bool
 };
 var defaultProps = {
   pan: false,
-  minZoom: 0.5,
-  maxZoom: 7,
+  minZoom: 0.1,
+  maxZoom: 3,
+  defaultZoom: 0.5,
   containerClass: '',
   chartClass: '',
   draggable: false,
   collapsible: true,
   multipleSelect: false,
-  toggleableSiblings: true
+  toggleableSiblings: true,
+  loading: false
 };
 var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var datasource = _ref.datasource,
       pan = _ref.pan,
       minZoom = _ref.minZoom,
       maxZoom = _ref.maxZoom,
+      defaultZoom = _ref.defaultZoom,
       containerClass = _ref.containerClass,
       chartClass = _ref.chartClass,
       NodeTemplate = _ref.NodeTemplate,
@@ -88,7 +93,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       multipleSelect = _ref.multipleSelect,
       onClickNode = _ref.onClickNode,
       onClickChart = _ref.onClickChart,
-      toggleableSiblings = _ref.toggleableSiblings;
+      toggleableSiblings = _ref.toggleableSiblings,
+      loading = _ref.loading;
   var container = (0, _react.useRef)();
   var chart = (0, _react.useRef)();
 
@@ -122,6 +128,11 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       zoom = _useState10[0],
       setZoom = _useState10[1];
 
+  var _useState11 = (0, _react.useState)(datasource),
+      _useState12 = _slicedToArray(_useState11, 2),
+      ds = _useState12[0],
+      setDS = _useState12[1];
+
   var attachRel = function attachRel(data, flags) {
     data.relationship = flags + (data.children && data.children.length > 0 ? 1 : 0);
 
@@ -134,11 +145,14 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     return data;
   };
 
-  var _useState11 = (0, _react.useState)(datasource),
-      _useState12 = _slicedToArray(_useState11, 2),
-      ds = _useState12[0],
-      setDS = _useState12[1];
+  var setTransform = function setTransform(z) {
+    setZoom(z);
+    return "scale(".concat(z, ")");
+  };
 
+  (0, _react.useEffect)(function () {
+    chart.current.style.transform = setTransform(defaultZoom);
+  }, []);
   (0, _react.useEffect)(function () {
     setDS(datasource);
   }, [datasource]);
@@ -251,19 +265,47 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     });
   }
 
+  var chartToImage = function chartToImage(exportFilename, originalScrollLeft, originalScrollTop) {
+    _domToImage.default.toSvg(chart.current, {
+      width: chart.current.scrollWidth,
+      height: chart.current.scrollHeight,
+      style: {
+        transform: ''
+      }
+    }).then(function (canvas) {
+      var width, height;
+      var aspectRatio = chart.current.scrollWidth / chart.current.scrollHeight;
+
+      if (aspectRatio > 1) {
+        width = Math.min(chart.current.scrollWidth, 16384);
+        height = width / aspectRatio;
+      } else {
+        height = Math.min(chart.current.scrollHeight, 16384);
+        width = height * aspectRatio;
+      }
+
+      base64SvgToBase64Png(canvas, width, height, exportFilename).then(function () {
+        chart.current.style.transform = setTransform(zoom);
+        setExporting(false);
+        container.current.scrollLeft = originalScrollLeft;
+        container.current.scrollTop = originalScrollTop;
+      });
+    }).catch(function (e) {
+      setExporting(false);
+    });
+  };
+
   (0, _react.useImperativeHandle)(ref, function () {
     return {
       resetZoom: function resetZoom() {
-        chart.current.style.transform = "scale(".concat(1, ")");
-        setZoom(1);
+        chart.current.style.transform = setTransform(defaultZoom);
       },
       zoomIn: function zoomIn() {
         var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.05;
         var newZoom = zoom + amount;
 
         if (newZoom <= maxZoom) {
-          chart.current.style.transform = "scale(".concat(newZoom, ")");
-          setZoom(newZoom);
+          chart.current.style.transform = setTransform(newZoom);
         }
       },
       zoomOut: function zoomOut() {
@@ -271,8 +313,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
         var newZoom = zoom - amount;
 
         if (newZoom > 0 && newZoom > minZoom) {
-          chart.current.style.transform = "scale(".concat(newZoom, ")");
-          setZoom(newZoom);
+          chart.current.style.transform = setTransform(newZoom);
         }
       },
       exportTo: function exportTo(exportFilename) {
@@ -282,37 +323,12 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
         container.current.scrollLeft = 0;
         var originalScrollTop = container.current.scrollTop;
         container.current.scrollTop = 0;
-
-        _domToImage.default.toSvg(chart.current, {
-          width: chart.current.scrollWidth,
-          height: chart.current.scrollHeight,
-          onclone: function onclone(clonedDoc) {
-            clonedDoc.querySelector('.orgchart').style.background = 'none';
-            clonedDoc.querySelector('.orgchart').style.transform = '';
-          }
-        }).then(function (canvas) {
-          var width, height;
-          var aspectRatio = chart.current.scrollWidth / chart.current.scrollHeight;
-
-          if (aspectRatio > 1) {
-            width = Math.min(chart.current.scrollWidth, 16384);
-            height = width / aspectRatio;
-          } else {
-            height = Math.min(chart.current.scrollHeight, 16384);
-            width = height * aspectRatio;
-          }
-
-          base64SvgToBase64Png(canvas, width, height, exportFilename).then(function () {
-            setExporting(false);
-            container.current.scrollLeft = originalScrollLeft;
-            container.current.scrollTop = originalScrollTop;
-          });
-        }).catch(function () {
-          setExporting(false);
-        });
+        setTimeout(function () {
+          chartToImage(exportFilename, originalScrollLeft, originalScrollTop);
+        }, 300);
       },
       expandAllNodes: function expandAllNodes() {
-        chart.current.querySelectorAll('.oc-node.hidden, .oc-hierarchy.hidden, .isSiblingsCollapsed, .isAncestorsCollapsed').forEach(function (el) {
+        chart.current.querySelectorAll('.oc-node.hidden, .oc-hierarchy.hidden, .isSiblingsCollapsed, .isAncestorsCollapsed, .oc-children.hidden').forEach(function (el) {
           el.classList.remove('hidden', 'isSiblingsCollapsed', 'isAncestorsCollapsed');
         });
       }
@@ -320,7 +336,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   });
   return /*#__PURE__*/_react.default.createElement("div", {
     ref: container,
-    className: "orgchart-container ".concat(exporting ? 'exporting-chart-container ' : '', " ").concat(containerClass),
+    className: "orgchart-container ".concat(exporting || loading ? 'exporting-chart-container ' : '', " ").concat(containerClass),
     style: {
       cursor: cursor
     },
@@ -329,7 +345,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     onMouseMove: pan && panning ? panHandler : undefined
   }, /*#__PURE__*/_react.default.createElement("div", {
     ref: chart,
-    className: "orgchart ".concat(exporting ? 'exporting-chart ' : '', " ").concat(chartClass),
+    className: "orgchart ".concat(exporting || loading ? 'exporting-chart ' : '', " ").concat(chartClass),
     onClick: clickChartHandler
   }, /*#__PURE__*/_react.default.createElement("ul", null, /*#__PURE__*/_react.default.createElement(_ChartNode.default, {
     datasource: attachRel(ds, '00'),
@@ -341,7 +357,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     onClickNode: onClickNode,
     toggleableSiblings: toggleableSiblings
   }))), /*#__PURE__*/_react.default.createElement("div", {
-    className: "oc-mask ".concat(exporting ? '' : 'hidden')
+    className: "oc-mask ".concat(exporting || loading ? '' : 'hidden')
   }, /*#__PURE__*/_react.default.createElement("i", {
     className: "oci oci-spinner spinner"
   })));
