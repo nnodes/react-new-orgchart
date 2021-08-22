@@ -1,6 +1,6 @@
 {
   "name": "@jearaneda/react-new-orgchart",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "An OrgChart fork with a focus on readability and compatibility with bulky diagrams.",
   "main": "./dist/ChartContainer.js",
   "files": [
