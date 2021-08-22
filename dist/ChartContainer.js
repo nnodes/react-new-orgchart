@@ -116,7 +116,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var _useState5 = (0, _react.useState)(false),
       _useState6 = _slicedToArray(_useState5, 2),
       exporting = _useState6[0],
-      setExporting = _useState6[1];
+      _setExporting = _useState6[1];
 
   var _useState7 = (0, _react.useState)({
     left: 0,
@@ -291,17 +291,22 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
 
       base64SvgToBase64Png(canvas, width, height, exportFilename).then(function () {
         chart.current.style.transform = setTransform(zoom);
-        setExporting(false);
+
+        _setExporting(false);
+
         container.current.scrollLeft = originalScrollLeft;
         container.current.scrollTop = originalScrollTop;
       });
     }).catch(function (e) {
-      setExporting(false);
+      _setExporting(false);
     });
   };
 
   (0, _react.useImperativeHandle)(ref, function () {
     return {
+      setExporting: function setExporting(exporting) {
+        return _setExporting(exporting);
+      },
       resetZoom: function resetZoom() {
         chart.current.style.transform = setTransform(defaultZoom);
       },
@@ -323,7 +328,9 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       },
       exportTo: function exportTo(exportFilename) {
         exportFilename = exportFilename || 'OrgChart';
-        setExporting(true);
+
+        _setExporting(true);
+
         var originalScrollLeft = container.current.scrollLeft;
         container.current.scrollLeft = 0;
         var originalScrollTop = container.current.scrollTop;

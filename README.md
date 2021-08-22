@@ -163,6 +163,12 @@
       Resets zoom to defaultZoom.
       </td>
     </tr>
+    <tr>
+      <td>setExporting()</td>
+      <td>
+      Sets exporting state. Useful if you need any transformations before actually exporting.
+      </td>
+    </tr>
   </tbody>
 </table>
 

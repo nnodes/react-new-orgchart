@@ -231,6 +231,7 @@ const ChartContainer = forwardRef(
     };
 
     useImperativeHandle(ref, () => ({
+      setExporting: (exporting) => setExporting(exporting),
       resetZoom: () => {
         chart.current.style.transform = setTransform(defaultZoom);
       },
