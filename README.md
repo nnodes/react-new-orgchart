@@ -113,6 +113,12 @@
       <td>Use this prop to trigger OrgChart's spinner on-demand.</td>
     </tr>
     <tr>
+      <td>loadingComponent</td>
+      <td>React Element</td>
+      <td>&lt;i className="oci oci-spinner"&gt;&lt;/i&gt;</td>
+      <td>Use your app's existing loading component to maintain design.</td>
+    </tr>
+    <tr>
       <td>defaultZoom</td>
       <td>number</td>
       <td>0.5</td>
@@ -154,7 +160,7 @@
     <tr>
       <td>resetZoom()</td>
       <td>
-      Resets zoom to 1.
+      Resets zoom to defaultZoom.
       </td>
     </tr>
   </tbody>

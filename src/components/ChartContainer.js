@@ -28,6 +28,7 @@ const propTypes = {
   onClickChart: PropTypes.func,
   toggleableSiblings: PropTypes.bool,
   loading: PropTypes.bool,
+  loadingComponent: PropTypes.element,
 };
 
 const defaultProps = {
@@ -42,6 +43,7 @@ const defaultProps = {
   multipleSelect: false,
   toggleableSiblings: true,
   loading: false,
+  loadingComponent: <i className="oci oci-spinner"></i>,
 };
 
 const ChartContainer = forwardRef(
@@ -62,6 +64,7 @@ const ChartContainer = forwardRef(
       onClickChart,
       toggleableSiblings,
       loading,
+      loadingComponent,
     },
     ref
   ) => {
@@ -303,7 +306,7 @@ const ChartContainer = forwardRef(
           </ul>
         </div>
         <div className={`oc-mask ${exporting || loading ? '' : 'hidden'}`}>
-          <i className="oci oci-spinner spinner"></i>
+          <div className="spinner">{loadingComponent}</div>
         </div>
       </div>
     );

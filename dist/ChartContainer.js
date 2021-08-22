@@ -64,7 +64,8 @@ var propTypes = {
   onClickNode: _propTypes.default.func,
   onClickChart: _propTypes.default.func,
   toggleableSiblings: _propTypes.default.bool,
-  loading: _propTypes.default.bool
+  loading: _propTypes.default.bool,
+  loadingComponent: _propTypes.default.element
 };
 var defaultProps = {
   pan: false,
@@ -77,7 +78,10 @@ var defaultProps = {
   collapsible: true,
   multipleSelect: false,
   toggleableSiblings: true,
-  loading: false
+  loading: false,
+  loadingComponent: /*#__PURE__*/_react.default.createElement("i", {
+    className: "oci oci-spinner"
+  })
 };
 var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var datasource = _ref.datasource,
@@ -94,7 +98,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       onClickNode = _ref.onClickNode,
       onClickChart = _ref.onClickChart,
       toggleableSiblings = _ref.toggleableSiblings,
-      loading = _ref.loading;
+      loading = _ref.loading,
+      loadingComponent = _ref.loadingComponent;
   var container = (0, _react.useRef)();
   var chart = (0, _react.useRef)();
 
@@ -358,9 +363,9 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     toggleableSiblings: toggleableSiblings
   }))), /*#__PURE__*/_react.default.createElement("div", {
     className: "oc-mask ".concat(exporting || loading ? '' : 'hidden')
-  }, /*#__PURE__*/_react.default.createElement("i", {
-    className: "oci oci-spinner spinner"
-  })));
+  }, /*#__PURE__*/_react.default.createElement("div", {
+    className: "spinner"
+  }, loadingComponent)));
 });
 ChartContainer.propTypes = propTypes;
 ChartContainer.defaultProps = defaultProps;
