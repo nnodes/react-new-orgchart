@@ -3,7 +3,7 @@
   text-align: center;
   display: flex;
   margin: 0;
-  transition: transform 0.3s, opacity 0.3s;
+  transition: all 0.4s;
 }
 
 .orgchart ul li {

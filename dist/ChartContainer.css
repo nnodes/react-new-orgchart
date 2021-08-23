@@ -34,9 +34,12 @@
   display: none !important;
 }
 
-.oc-children .hidden {
-  display: inline !important;
+.zero-opacity {
   opacity: 0;
+}
+
+.full-opacity {
+  opacity: 1;
 }
 
 .orgchart-container > .oc-mask {

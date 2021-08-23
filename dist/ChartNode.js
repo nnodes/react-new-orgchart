@@ -169,6 +169,7 @@ var ChartNode = function ChartNode(_ref) {
       // 向上展开，只展开一级
       actionNode.classList.remove('isAncestorsCollapsed');
       node.firstChild.classList.remove('hidden');
+      node.firstChild.classList.remove('zero-opacity');
       toggleSiblings(actionNode);
     } else {
       var _actionNode$classList;
@@ -184,7 +185,10 @@ var ChartNode = function ChartNode(_ref) {
 
       (_actionNode$classList = actionNode.classList).add.apply(_actionNode$classList, _toConsumableArray(('isAncestorsCollapsed' + (isSiblingsCollapsed ? '' : ' isSiblingsCollapsed')).split(' ')));
 
-      node.firstChild.classList.add('hidden'); // 如果还有展开的祖先节点，那继续折叠关闭之
+      node.firstChild.classList.add('zero-opacity');
+      setTimeout(function () {
+        node.firstChild.classList.add('hidden');
+      }, 301); // 如果还有展开的祖先节点，那继续折叠关闭之
 
       if (node.parentNode.closest('li') && !node.parentNode.closest('li').firstChild.classList.contains('hidden')) {
         toggleAncestors(node);
@@ -206,7 +210,13 @@ var ChartNode = function ChartNode(_ref) {
 
     if (isChildrenCollapsed) {
       children.classList.remove('hidden');
-    } else children.classList.add('hidden');
+      children.classList.remove('zero-opacity');
+    } else {
+      children.classList.add('zero-opacity');
+      setTimeout(function () {
+        children.classList.add('hidden');
+      }, 301);
+    }
   };
 
   var bottomEdgeClickHandler = function bottomEdgeClickHandler(e) {
@@ -225,8 +235,12 @@ var ChartNode = function ChartNode(_ref) {
     while (node) {
       if (isSiblingsCollapsed) {
         node.classList.remove('hidden');
+        node.classList.remove('zero-opacity');
       } else {
-        node.classList.add('hidden');
+        node.classList.add('zero-opacity');
+        setTimeout(function () {
+          node.classList.add('hidden');
+        }, 301);
       }
 
       node = node.previousSibling;
@@ -237,8 +251,12 @@ var ChartNode = function ChartNode(_ref) {
     while (node) {
       if (isSiblingsCollapsed) {
         node.classList.remove('hidden');
+        node.classList.remove('zero-opacity');
       } else {
-        node.classList.add('hidden');
+        node.classList.add('zero-opacity');
+        setTimeout(function () {
+          node.classList.add('hidden');
+        }, 301);
       }
 
       node = node.nextSibling;
