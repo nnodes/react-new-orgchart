@@ -276,7 +276,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       height: chart.current.scrollHeight,
       style: {
         transform: ''
-      }
+      },
+      imagePlaceholder: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY7h79y4ABTICmGnXPbMAAAAASUVORK5CYII='
     }).then(function (canvas) {
       var width, height;
       var aspectRatio = chart.current.scrollWidth / chart.current.scrollHeight;
