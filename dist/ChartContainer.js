@@ -368,7 +368,8 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     multipleSelect: multipleSelect,
     changeHierarchy: changeHierarchy,
     onClickNode: onClickNode,
-    toggleableSiblings: toggleableSiblings
+    toggleableSiblings: toggleableSiblings,
+    isUser: attachRel(ds, '00').isUser
   }))), /*#__PURE__*/_react.default.createElement("div", {
     className: "oc-mask ".concat(exporting || loading ? '' : 'hidden')
   }, /*#__PURE__*/_react.default.createElement("div", {

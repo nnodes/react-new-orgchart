@@ -55,13 +55,15 @@ var propTypes = {
   multipleSelect: _propTypes.default.bool,
   changeHierarchy: _propTypes.default.func,
   onClickNode: _propTypes.default.func,
-  toggleableSiblings: _propTypes.default.bool
+  toggleableSiblings: _propTypes.default.bool,
+  isUser: _propTypes.default.bool
 };
 var defaultProps = {
   draggable: false,
   collapsible: true,
   multipleSelect: false,
-  toggleableSiblings: false
+  toggleableSiblings: false,
+  isUser: false
 };
 
 var ChartNode = function ChartNode(_ref) {
@@ -72,7 +74,8 @@ var ChartNode = function ChartNode(_ref) {
       multipleSelect = _ref.multipleSelect,
       changeHierarchy = _ref.changeHierarchy,
       onClickNode = _ref.onClickNode,
-      toggleableSiblings = _ref.toggleableSiblings;
+      toggleableSiblings = _ref.toggleableSiblings,
+      isUser = _ref.isUser;
   var node = (0, _react.useRef)();
 
   var _useState = (0, _react.useState)(),
@@ -105,7 +108,7 @@ var ChartNode = function ChartNode(_ref) {
       selected = _useState12[0],
       setSelected = _useState12[1];
 
-  var nodeClass = ['oc-node', allowedDrop ? 'allowedDrop' : '', selected ? 'selected' : ''].filter(function (item) {
+  var nodeClass = ['oc-node', isUser ? 'isUser' : '', allowedDrop ? 'allowedDrop' : '', selected ? 'selected' : ''].filter(function (item) {
     return item;
   }).join(' ');
   (0, _react.useEffect)(function () {
@@ -188,7 +191,7 @@ var ChartNode = function ChartNode(_ref) {
       node.firstChild.classList.add('zero-opacity');
       setTimeout(function () {
         node.firstChild.classList.add('hidden');
-      }, 301); // 如果还有展开的祖先节点，那继续折叠关闭之
+      }, 300); // 如果还有展开的祖先节点，那继续折叠关闭之
 
       if (node.parentNode.closest('li') && !node.parentNode.closest('li').firstChild.classList.contains('hidden')) {
         toggleAncestors(node);
@@ -215,7 +218,7 @@ var ChartNode = function ChartNode(_ref) {
       children.classList.add('zero-opacity');
       setTimeout(function () {
         children.classList.add('hidden');
-      }, 301);
+      }, 300);
     }
   };
 
@@ -240,7 +243,7 @@ var ChartNode = function ChartNode(_ref) {
         node.classList.add('zero-opacity');
         setTimeout(function () {
           node.classList.add('hidden');
-        }, 301);
+        }, 300);
       }
 
       node = node.previousSibling;
@@ -256,7 +259,7 @@ var ChartNode = function ChartNode(_ref) {
         node.classList.add('zero-opacity');
         setTimeout(function () {
           node.classList.add('hidden');
-        }, 301);
+        }, 300);
       }
 
       node = node.nextSibling;
@@ -357,6 +360,7 @@ var ChartNode = function ChartNode(_ref) {
   }, datasource.children.map(function (node) {
     return /*#__PURE__*/_react.default.createElement(ChartNode, {
       datasource: node,
+      isUser: node.isUser,
       NodeTemplate: NodeTemplate,
       id: node.id,
       key: node.id,

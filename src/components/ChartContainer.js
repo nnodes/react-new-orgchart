@@ -307,6 +307,7 @@ const ChartContainer = forwardRef(
               changeHierarchy={changeHierarchy}
               onClickNode={onClickNode}
               toggleableSiblings={toggleableSiblings}
+              isUser={attachRel(ds, '00').isUser}
             />
           </ul>
         </div>

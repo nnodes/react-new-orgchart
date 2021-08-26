@@ -12,6 +12,7 @@ const propTypes = {
   changeHierarchy: PropTypes.func,
   onClickNode: PropTypes.func,
   toggleableSiblings: PropTypes.bool,
+  isUser: PropTypes.bool,
 };
 
 const defaultProps = {
@@ -19,6 +20,7 @@ const defaultProps = {
   collapsible: true,
   multipleSelect: false,
   toggleableSiblings: false,
+  isUser: false,
 };
 
 const ChartNode = ({
@@ -30,6 +32,7 @@ const ChartNode = ({
   changeHierarchy,
   onClickNode,
   toggleableSiblings,
+  isUser,
 }) => {
   const node = useRef();
 
@@ -42,6 +45,7 @@ const ChartNode = ({
 
   const nodeClass = [
     'oc-node',
+    isUser ? 'isUser' : '',
     allowedDrop ? 'allowedDrop' : '',
     selected ? 'selected' : '',
   ]
@@ -141,7 +145,7 @@ const ChartNode = ({
       node.firstChild.classList.add('zero-opacity');
       setTimeout(function () {
         node.firstChild.classList.add('hidden');
-      }, 301);
+      }, 300);
       // 如果还有展开的祖先节点，那继续折叠关闭之
       if (
         node.parentNode.closest('li') &&
@@ -172,7 +176,7 @@ const ChartNode = ({
       children.classList.add('zero-opacity');
       setTimeout(function () {
         children.classList.add('hidden');
-      }, 301);
+      }, 300);
     }
   };
 
@@ -197,7 +201,7 @@ const ChartNode = ({
         node.classList.add('zero-opacity');
         setTimeout(function () {
           node.classList.add('hidden');
-        }, 301);
+        }, 300);
       }
       node = node.previousSibling;
     }
@@ -210,7 +214,7 @@ const ChartNode = ({
         node.classList.add('zero-opacity');
         setTimeout(function () {
           node.classList.add('hidden');
-        }, 301);
+        }, 300);
       }
       node = node.nextSibling;
     }
@@ -360,6 +364,7 @@ const ChartNode = ({
           {datasource.children.map((node) => (
             <ChartNode
               datasource={node}
+              isUser={node.isUser}
               NodeTemplate={NodeTemplate}
               id={node.id}
               key={node.id}
