@@ -55,13 +55,15 @@ var propTypes = {
   multipleSelect: _propTypes.default.bool,
   changeHierarchy: _propTypes.default.func,
   onClickNode: _propTypes.default.func,
-  toggleableSiblings: _propTypes.default.bool
+  toggleableSiblings: _propTypes.default.bool,
+  isUser: _propTypes.default.bool
 };
 var defaultProps = {
   draggable: false,
   collapsible: true,
   multipleSelect: false,
-  toggleableSiblings: false
+  toggleableSiblings: false,
+  isUser: false
 };
 
 var ChartNode = function ChartNode(_ref) {
@@ -72,7 +74,8 @@ var ChartNode = function ChartNode(_ref) {
       multipleSelect = _ref.multipleSelect,
       changeHierarchy = _ref.changeHierarchy,
       onClickNode = _ref.onClickNode,
-      toggleableSiblings = _ref.toggleableSiblings;
+      toggleableSiblings = _ref.toggleableSiblings,
+      isUser = _ref.isUser;
   var node = (0, _react.useRef)();
 
   var _useState = (0, _react.useState)(),
@@ -105,7 +108,7 @@ var ChartNode = function ChartNode(_ref) {
       selected = _useState12[0],
       setSelected = _useState12[1];
 
-  var nodeClass = ['oc-node', allowedDrop ? 'allowedDrop' : '', selected ? 'selected' : ''].filter(function (item) {
+  var nodeClass = ['oc-node', isUser ? 'isUser' : '', allowedDrop ? 'allowedDrop' : '', selected ? 'selected' : ''].filter(function (item) {
     return item;
   }).join(' ');
   (0, _react.useEffect)(function () {
@@ -169,6 +172,7 @@ var ChartNode = function ChartNode(_ref) {
       // 向上展开，只展开一级
       actionNode.classList.remove('isAncestorsCollapsed');
       node.firstChild.classList.remove('hidden');
+      node.firstChild.classList.remove('zero-opacity');
       toggleSiblings(actionNode);
     } else {
       var _actionNode$classList;
@@ -184,7 +188,10 @@ var ChartNode = function ChartNode(_ref) {
 
       (_actionNode$classList = actionNode.classList).add.apply(_actionNode$classList, _toConsumableArray(('isAncestorsCollapsed' + (isSiblingsCollapsed ? '' : ' isSiblingsCollapsed')).split(' ')));
 
-      node.firstChild.classList.add('hidden'); // 如果还有展开的祖先节点，那继续折叠关闭之
+      node.firstChild.classList.add('zero-opacity');
+      setTimeout(function () {
+        node.firstChild.classList.add('hidden');
+      }, 300); // 如果还有展开的祖先节点，那继续折叠关闭之
 
       if (node.parentNode.closest('li') && !node.parentNode.closest('li').firstChild.classList.contains('hidden')) {
         toggleAncestors(node);
@@ -206,7 +213,13 @@ var ChartNode = function ChartNode(_ref) {
 
     if (isChildrenCollapsed) {
       children.classList.remove('hidden');
-    } else children.classList.add('hidden');
+      children.classList.remove('zero-opacity');
+    } else {
+      children.classList.add('zero-opacity');
+      setTimeout(function () {
+        children.classList.add('hidden');
+      }, 300);
+    }
   };
 
   var bottomEdgeClickHandler = function bottomEdgeClickHandler(e) {
@@ -225,8 +238,12 @@ var ChartNode = function ChartNode(_ref) {
     while (node) {
       if (isSiblingsCollapsed) {
         node.classList.remove('hidden');
+        node.classList.remove('zero-opacity');
       } else {
-        node.classList.add('hidden');
+        node.classList.add('zero-opacity');
+        setTimeout(function () {
+          node.classList.add('hidden');
+        }, 300);
       }
 
       node = node.previousSibling;
@@ -237,8 +254,12 @@ var ChartNode = function ChartNode(_ref) {
     while (node) {
       if (isSiblingsCollapsed) {
         node.classList.remove('hidden');
+        node.classList.remove('zero-opacity');
       } else {
-        node.classList.add('hidden');
+        node.classList.add('zero-opacity');
+        setTimeout(function () {
+          node.classList.add('hidden');
+        }, 300);
       }
 
       node = node.nextSibling;
@@ -339,6 +360,7 @@ var ChartNode = function ChartNode(_ref) {
   }, datasource.children.map(function (node) {
     return /*#__PURE__*/_react.default.createElement(ChartNode, {
       datasource: node,
+      isUser: node.isUser,
       NodeTemplate: NodeTemplate,
       id: node.id,
       key: node.id,

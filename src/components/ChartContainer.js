@@ -263,11 +263,13 @@ const ChartContainer = forwardRef(
       expandAllNodes: () => {
         chart.current
           .querySelectorAll(
-            '.oc-node.hidden, .oc-hierarchy.hidden, .isSiblingsCollapsed, .isAncestorsCollapsed, .oc-children.hidden'
+            '.oc-node.hidden, .oc-node-full-opacity, .oc-node.zero-opacity, .oc-hierarchy.hidden, .oc-hierarchy.full-opacity, .oc-hierarchy.zero-opacity, .isSiblingsCollapsed, .isAncestorsCollapsed, .oc-children.hidden, .oc-children-full-opacity, .oc-children-zero-opacity'
           )
           .forEach((el) => {
             el.classList.remove(
               'hidden',
+              'full-opacity',
+              'zero-opacity',
               'isSiblingsCollapsed',
               'isAncestorsCollapsed'
             );
@@ -305,6 +307,7 @@ const ChartContainer = forwardRef(
               changeHierarchy={changeHierarchy}
               onClickNode={onClickNode}
               toggleableSiblings={toggleableSiblings}
+              isUser={attachRel(ds, '00').isUser}
             />
           </ul>
         </div>
